@@ -140,7 +140,7 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
   const catColor = category ? categoryColors[category] : 'var(--accent-blue)';
 
   return (
-    <div style={{ maxWidth: 800, display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ maxWidth: 800, width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Toolbar */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         {/* Search */}

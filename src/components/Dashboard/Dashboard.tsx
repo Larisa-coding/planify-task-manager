@@ -200,7 +200,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
   };
 
   return (
-    <div style={{ maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ maxWidth: 860, width: '100%', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {/* Greeting */}
       <div style={{ paddingLeft: 4 }}>
@@ -211,7 +211,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
       </div>
 
       {/* 4 big square tiles */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+      <div className="dashboard-tiles">
         {(['personal', 'work', 'wishes', 'calendar'] as const).map(key => {
           const cfg = CAT_CONFIG[key];
           const catStats = key !== 'calendar' ? stats.byCategory[key as CatKey] : null;
@@ -231,12 +231,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
                 WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
                 border: '1px solid var(--glass-border)',
                 borderRadius: 20,
-                padding: '24px 22px',
+                padding: '20px 16px',
                 cursor: 'pointer',
                 transition: 'all 0.22s ease',
                 position: 'relative',
                 overflow: 'hidden',
-                minHeight: 160,
+                minHeight: 140,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -300,7 +300,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
       </div>
 
       {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div className="dashboard-charts">
 
         {/* Category donut */}
         <div

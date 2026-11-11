@@ -131,7 +131,7 @@ export const NotesList: React.FC<NotesListProps> = ({ onAddNote, onEditNote }) =
           </p>
         </div>
       ) : (
-        <div style={{
+        <div className="notes-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: 14,
