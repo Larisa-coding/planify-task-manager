@@ -1,28 +1,28 @@
 import React from 'react';
-import { LayoutDashboard, CheckSquare, Calendar, FileText, Plus } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Calendar, BarChart2, Plus } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { Page } from '../../App';
 import { TaskCategory } from '../../types';
 
 interface BottomNavProps {
   currentPage: Page;
-  onNavigate: (page: Page) => void;
-  onAddTask: (category?: TaskCategory) => void;
+  onNavigate: (page: Page, category?: TaskCategory) => void;
+  onAddTask: () => void;
 }
 
-type NavItem =
+type NavEntry =
   | { type: 'page'; id: Page; label: string; icon: React.ReactNode }
   | { type: 'fab' };
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentPage, onNavigate, onAddTask }) => {
   const { t } = useLanguage();
 
-  const items: NavItem[] = [
+  const items: NavEntry[] = [
     { type: 'page', id: 'dashboard', label: t.nav.dashboard, icon: <LayoutDashboard size={22} /> },
     { type: 'page', id: 'tasks',     label: t.nav.tasks,     icon: <CheckSquare size={22} /> },
     { type: 'fab' },
     { type: 'page', id: 'calendar',  label: t.nav.calendar,  icon: <Calendar size={22} /> },
-    { type: 'page', id: 'notes',     label: t.nav.notes,     icon: <FileText size={22} /> },
+    { type: 'page', id: 'analytics', label: t.nav.analytics, icon: <BarChart2 size={22} /> },
   ];
 
   return (
@@ -31,24 +31,19 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentPage, onNavigate, o
         if (item.type === 'fab') {
           return (
             <div key="fab" className="bottom-nav-fab-wrap">
-              <button
-                className="bottom-nav-fab"
-                onClick={() => onAddTask()}
-                aria-label="Add task"
-              >
+              <button className="bottom-nav-fab" onClick={onAddTask} aria-label="Add task">
                 <Plus size={24} />
               </button>
             </div>
           );
         }
-
-        const isActive = currentPage === item.id;
+        const active = currentPage === item.id;
         return (
           <button
             key={item.id}
-            className={`bottom-nav-item ${isActive ? 'active' : ''}`}
+            className={`bottom-nav-item ${active ? 'active' : ''}`}
             onClick={() => onNavigate(item.id)}
-            aria-current={isActive ? 'page' : undefined}
+            aria-current={active ? 'page' : undefined}
           >
             <span className="bottom-nav-icon">{item.icon}</span>
             <span className="bottom-nav-label">{item.label}</span>

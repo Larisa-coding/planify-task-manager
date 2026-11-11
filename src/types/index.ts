@@ -31,38 +31,11 @@ export interface Task {
   actualHours?: number;
 }
 
-export interface Note {
-  id: string;
-  title: string;
-  content: string;
-  color?: string;
-  tags: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  archived?: boolean;
-  archivedAt?: Date;
-  isDeleted?: boolean;
-  deletedAt?: Date;
-}
-
 export interface FilterOptions {
   status?: TaskStatus[];
   priority?: Priority[];
   category?: TaskCategory[];
-  dueDate?: {
-    from?: Date;
-    to?: Date;
-  };
+  dueDate?: { from?: Date; to?: Date };
   tags?: string[];
   search?: string;
-}
-
-export interface DashboardStats {
-  totalTasks: number;
-  completedTasks: number;
-  overdueTasks: number;
-  inProgressTasks: number;
-  tasksByCategory: Record<TaskCategory, number>;
-  completionRate: number;
-  avgCompletionTimeHours: number;
 }

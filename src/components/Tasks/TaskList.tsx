@@ -6,8 +6,7 @@ import {
 } from 'lucide-react';
 import { useTasks } from '../../hooks/useTasks';
 import { useLanguage } from '../../context/LanguageContext';
-import { Task, TaskCategory, Priority, TaskStatus } from '../../types';
-import { format, isBefore, isToday, isTomorrow } from 'date-fns';
+import { Task, TaskCategory, Priority, TaskStatus } from '../../types';import { format, isBefore, isToday, isTomorrow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 interface TaskListProps {
@@ -33,9 +32,7 @@ const priorityOrder: Record<Priority, number> = { urgent: 0, high: 1, medium: 2,
 type SortKey = 'createdAt' | 'dueDate' | 'priority' | 'title';
 
 export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditTask }) => {
-  const { tasks, loading, updateTaskStatus, deleteTask } = useTasks(
-    category ? { category: [category] } : undefined
-  );
+  const { tasks, loading, updateTaskStatus, deleteTask } = useTasks(category);
   const { t, language } = useLanguage();
 
   const [search, setSearch] = useState('');

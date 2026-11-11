@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 interface DashboardProps {
-  onNavigate: (page: Page) => void;
+  onNavigate: (page: Page, category?: TaskCategory) => void;
   onAddTask: (category?: TaskCategory) => void;
 }
 
@@ -223,8 +223,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
               key={key}
               role="button"
               tabIndex={0}
-              onClick={() => onNavigate(cfg.page)}
-              onKeyDown={e => e.key === 'Enter' && onNavigate(cfg.page)}
+              onClick={() => key === 'calendar' ? onNavigate('calendar') : onNavigate('tasks', key as TaskCategory)}
+              onKeyDown={e => e.key === 'Enter' && (key === 'calendar' ? onNavigate('calendar') : onNavigate('tasks', key as TaskCategory))}
               style={{
                 background: 'var(--glass-bg-card)',
                 backdropFilter: 'blur(20px) saturate(1.8)',
