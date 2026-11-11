@@ -3,8 +3,10 @@ import { db } from '../database/db';
 import { Task, TaskStatus, TaskCategory } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
-// Accepts primitive category string instead of a FilterOptions object
-// so useCallback dependency is stable and doesn't re-create on every render
+// Global event bus: dispatch 'tasks-updated' after any write so all hooks reload
+export const notifyTasksUpdated = () =>
+  window.dispatchEvent(new CustomEvent('tasks-updated'));
+
 export const useTasks = (category?: TaskCategory) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,9 +17,7 @@ export const useTasks = (category?: TaskCategory) => {
       setLoading(true);
       setError(null);
       let all = await db.tasks.orderBy('createdAt').toArray();
-      // Exclude soft-deleted
       all = all.filter(t => t.isDeleted !== true);
-      // Filter by category if provided
       if (category) {
         all = all.filter(t => t.category === category);
       }
@@ -27,32 +27,38 @@ export const useTasks = (category?: TaskCategory) => {
     } finally {
       setLoading(false);
     }
-  }, [category]); // stable: only re-runs when category string changes
+  }, [category]);
 
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
 
+  // Re-load whenever any component writes to the DB
+  useEffect(() => {
+    window.addEventListener('tasks-updated', loadTasks);
+    return () => window.removeEventListener('tasks-updated', loadTasks);
+  }, [loadTasks]);
+
   const createTask = async (data: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     const task: Task = { ...data, id: uuidv4(), createdAt: new Date(), updatedAt: new Date() };
     await db.tasks.add(task);
-    await loadTasks();
+    notifyTasksUpdated();
     return task;
   };
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
     await db.tasks.update(id, { ...updates, updatedAt: new Date() } as any);
-    await loadTasks();
+    notifyTasksUpdated();
   };
 
   const deleteTask = async (id: string) => {
     await db.tasks.update(id, { isDeleted: true, deletedAt: new Date(), updatedAt: new Date() } as any);
-    await loadTasks();
+    notifyTasksUpdated();
   };
 
   const permanentDeleteTask = async (id: string) => {
     await db.tasks.delete(id);
-    await loadTasks();
+    notifyTasksUpdated();
   };
 
   const updateTaskStatus = async (id: string, status: TaskStatus) => {
@@ -60,7 +66,7 @@ export const useTasks = (category?: TaskCategory) => {
     if (status === 'completed') updates.completedAt = new Date();
     else updates.completedAt = undefined;
     await db.tasks.update(id, updates as any);
-    await loadTasks();
+    notifyTasksUpdated();
   };
 
   const restoreTask = async (id: string) => {
@@ -70,7 +76,7 @@ export const useTasks = (category?: TaskCategory) => {
       status: 'new',
       updatedAt: new Date(),
     } as any);
-    await loadTasks();
+    notifyTasksUpdated();
   };
 
   return {
@@ -101,9 +107,15 @@ export const useAllTasksForArchive = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  // Also react to writes from TaskForm
+  useEffect(() => {
+    window.addEventListener('tasks-updated', load);
+    return () => window.removeEventListener('tasks-updated', load);
+  }, [load]);
+
   const permanentDelete = async (id: string) => {
     await db.tasks.delete(id);
-    await load();
+    notifyTasksUpdated();
   };
 
   const restore = async (id: string) => {
@@ -114,7 +126,7 @@ export const useAllTasksForArchive = () => {
       completedAt: undefined,
       updatedAt: new Date(),
     } as any);
-    await load();
+    notifyTasksUpdated();
   };
 
   return { tasks, loading, permanentDelete, restore, refetch: load };
