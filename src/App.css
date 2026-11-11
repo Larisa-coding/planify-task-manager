@@ -1381,3 +1381,44 @@ body {
     top: calc(var(--header-height) + 20px);
   }
 }
+
+/* =============================================
+   FORM DATE/NUMBER INPUT FIXES FOR MOBILE
+   ============================================= */
+
+/* Force date and number inputs to never overflow their container */
+input[type="date"],
+input[type="number"] {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* On iOS, date input has weird padding — normalize it */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* form-row-2 always stacks on very small screens */
+@media (max-width: 360px) {
+  .form-row-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Modal must never be wider than viewport */
+.modal-overlay {
+  overflow: hidden;
+}
+
+.modal-content {
+  box-sizing: border-box;
+  max-width: min(540px, 100vw);
+}
+
+/* Prevent any child from causing horizontal scroll inside modal */
+.form-body * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
