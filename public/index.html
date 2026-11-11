@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#292d2f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="TaskManager Pro" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="description"
+      content="Профессиональный менеджер задач с расширенным функционалом. Управляйте задачами, проектами и клиентами с любого устройства."
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/icon-192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>TaskManager Pro</title>
+  </head>
+  <body>
+    <noscript>Вам необходимо включить JavaScript для работы этого приложения.</noscript>
+    <div id="root"></div>
+    <script>
+      // Регистрация Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

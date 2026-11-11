@@ -1,0 +1,137 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Подключаем Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+@layer components {
+  /* Главная кнопка - темно-графитовая с glassmorphism */
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg border text-sm font-medium 
+           transition-all duration-300 hover:scale-105 
+           backdrop-blur-sm shadow-lg hover:shadow-xl;
+    background-color: rgba(41, 45, 47, 0.9);
+    border-color: rgba(120, 120, 120, 0.3);
+    color: #c0c0c0;
+  }
+  
+  .btn-primary:hover {
+    background-color: rgba(50, 55, 57, 0.9);
+    border-color: rgba(140, 140, 140, 0.4);
+    color: #d0d0d0;
+  }
+
+  /* Вторичная кнопка */
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg border font-medium 
+           transition-all duration-300 hover:scale-105 
+           backdrop-blur-sm;
+    background-color: rgba(41, 45, 47, 0.5);
+    border-color: rgba(100, 100, 100, 0.25);
+    color: #b0b0b0;
+  }
+  
+  .btn-secondary:hover {
+    background-color: rgba(50, 55, 57, 0.5);
+    border-color: rgba(120, 120, 120, 0.35);
+    color: #c0c0c0;
+  }
+
+  /* Маленькая кнопка */
+  .btn-sm {
+    @apply px-3 py-1.5 rounded-lg border text-sm font-medium 
+           transition-all duration-300 hover:scale-105 
+           backdrop-blur-sm;
+    background-color: rgba(41, 45, 47, 0.5);
+    border-color: rgba(120, 120, 120, 0.3);
+    color: #c0c0c0;
+  }
+  
+  .btn-sm:hover {
+    background-color: rgba(50, 55, 57, 0.5);
+    border-color: rgba(140, 140, 140, 0.4);
+    color: #d0d0d0;
+  }
+
+  /* Кнопка с иконкой */
+  .btn-icon {
+    @apply p-2 rounded-lg border 
+           transition-all duration-300 hover:scale-110 
+           backdrop-blur-sm;
+    background-color: rgba(41, 45, 47, 0.5);
+    border-color: rgba(120, 120, 120, 0.3);
+    color: #b0b0b0;
+  }
+  
+  .btn-icon:hover {
+    background-color: rgba(50, 55, 57, 0.5);
+    border-color: rgba(140, 140, 140, 0.4);
+    color: #c0c0c0;
+  }
+
+  /* Опасная кнопка (удаление и т.д.) */
+  .btn-danger {
+    @apply px-4 py-2 rounded-lg border font-medium 
+           transition-all duration-300 hover:scale-105 
+           backdrop-blur-sm;
+    background-color: rgba(41, 45, 47, 0.9);
+    border-color: rgba(120, 100, 100, 0.4);
+    color: #c08080;
+  }
+  
+  .btn-danger:hover {
+    background-color: rgba(50, 55, 57, 0.9);
+    border-color: rgba(140, 110, 110, 0.5);
+    color: #d09090;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(to bottom right, #1a1d1f, #292d2f, #1f2224);
+}
+
+/* Стили для заголовков */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Специальные классы для заголовков */
+.font-display {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.font-heading {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.font-accent {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}

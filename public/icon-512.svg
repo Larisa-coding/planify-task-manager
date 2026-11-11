@@ -1,0 +1,39 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Внешний круг с glassmorphism эффектом -->
+  <circle cx="256" cy="256" r="240" fill="url(#gradient1)" stroke="rgba(200, 200, 200, 0.3)" stroke-width="4"/>
+  
+  <!-- Внутренний контейнер с закругленными углами -->
+  <rect x="80" y="80" width="352" height="352" rx="64" ry="64" fill="url(#gradient2)" stroke="rgba(180, 180, 180, 0.4)" stroke-width="2"/>
+  
+  <!-- Щит -->
+  <path d="M256 128 L320 170.67 L320 256 C320 298.67 288 341.33 256 341.33 C224 341.33 192 298.67 192 256 L192 170.67 Z" 
+        fill="url(#gradient3)" 
+        stroke="rgba(200, 200, 200, 0.6)" 
+        stroke-width="4" 
+        stroke-linejoin="round"/>
+  
+  <!-- Внутренний элемент щита -->
+  <path d="M256 149.33 L288 170.67 L288 256 C288 277.33 277.33 288 256 288 C234.67 288 224 277.33 224 256 L224 170.67 Z" 
+        fill="rgba(255, 255, 255, 0.1)" 
+        stroke="rgba(220, 220, 220, 0.3)" 
+        stroke-width="2"/>
+  
+  <!-- Центральная точка -->
+  <circle cx="256" cy="234.67" r="10" fill="rgba(255, 255, 255, 0.8)"/>
+  
+  <!-- Градиенты -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2e30;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#1f2224;stop-opacity:0.9" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a3e40;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#2a2e30;stop-opacity:0.8" />
+    </linearGradient>
+    <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a4e50;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#3a3e40;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+</svg>
