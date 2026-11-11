@@ -1211,3 +1211,173 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* =============================================
+   TASK FORM — RESPONSIVE
+   ============================================= */
+
+.form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.form-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.form-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+.form-footer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--glass-border);
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* 2-column grid that stacks on small mobile */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 400px) {
+  .form-row-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 3-column for categories (stays 3 — text is short enough) */
+.form-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.category-btn {
+  padding: 8px 4px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Native select styled to match glass inputs */
+.glass-select {
+  background: var(--glass-bg-card);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8f98' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.glass-select:focus {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px rgba(180, 141, 245, 0.10);
+}
+
+.glass-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Modal bottom-sheet on mobile */
+@media (max-width: 540px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-content {
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 94vh;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .form-body {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .form-header,
+  .form-footer {
+    padding: 14px;
+  }
+}
+
+/* =============================================
+   CALENDAR — RESPONSIVE
+   ============================================= */
+
+/* On desktop: grid with side panel; on mobile: stacked */
+.calendar-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+@media (min-width: 700px) {
+  .calendar-layout.has-panel {
+    grid-template-columns: 1fr 280px;
+  }
+}
+
+/* On mobile, day detail panel appears below the grid */
+.calendar-day-panel {
+  width: 100%;
+}
+
+@media (min-width: 700px) {
+  .calendar-day-panel {
+    position: sticky;
+    top: calc(var(--header-height) + 20px);
+  }
+}

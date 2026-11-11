@@ -12,7 +12,7 @@ interface TaskFormProps {
   defaultCategory?: TaskCategory;
 }
 
-const COLORS = ['#58a6ff', '#a371f7', '#ff6eb3', '#3fb950', '#d29922', '#f85149', '#79c0ff', '#ffa657'];
+const COLORS = ['#b48df5', '#5ec4b8', '#f589b0', '#5cb87a', '#e0a060', '#e06060', '#7ab3f0', '#ffa657'];
 
 export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defaultCategory = 'personal' }) => {
   const { createTask, updateTask } = useTasks();
@@ -93,18 +93,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
     setCheckInput('');
   };
 
-  const toggleCheck = (id: string) =>
-    setChecklist(checklist.map(c => c.id === id ? { ...c, completed: !c.completed } : c));
-
-  const removeCheck = (id: string) =>
-    setChecklist(checklist.filter(c => c.id !== id));
-
   if (!isOpen) return null;
 
   const categories: { value: TaskCategory; label: string; color: string }[] = [
     { value: 'personal', label: t.categories.personal, color: 'var(--accent-purple)' },
-    { value: 'work',     label: t.categories.work,     color: 'var(--accent-blue)' },
-    { value: 'wishes',   label: t.categories.wishes,   color: 'var(--accent-pink)' },
+    { value: 'work',     label: t.categories.work,     color: 'var(--accent-teal)' },
+    { value: 'wishes',   label: t.categories.wishes,   color: 'var(--accent-rose)' },
   ];
 
   const statuses: { value: TaskStatus; label: string }[] = [
@@ -121,46 +115,24 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
     { value: 'urgent', label: t.priorities.urgent },
   ];
 
-  const labelStyle: React.CSSProperties = {
-    fontSize: 12, fontWeight: 600, color: 'var(--text-muted)',
-    textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6, display: 'block',
-  };
-
-  const selectStyle: React.CSSProperties = {
-    background: 'var(--glass-bg-card)',
-    border: '1px solid var(--glass-border)',
-    color: 'var(--text-primary)',
-    borderRadius: 10,
-    padding: '9px 12px',
-    width: '100%',
-    fontSize: 14,
-    outline: 'none',
-    fontFamily: 'inherit',
-    cursor: 'pointer',
-  };
-
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content" style={{ padding: 0 }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '20px 24px 16px',
-          borderBottom: '1px solid var(--glass-border)',
-        }}>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>
-            {task ? t.tasks.edit_task : t.tasks.add_task}
-          </h2>
-          <button className="btn btn-ghost btn-icon" onClick={onClose}>
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-content">
+
+        {/* ── Header ── */}
+        <div className="form-header">
+          <h2 className="form-title">{task ? t.tasks.edit_task : t.tasks.add_task}</h2>
+          <button className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close">
             <X size={18} />
           </button>
         </div>
 
-        {/* Body */}
-        <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* ── Body ── */}
+        <div className="form-body">
+
           {/* Title */}
-          <div>
-            <label style={labelStyle}>{t.tasks.task_title}</label>
+          <div className="form-field">
+            <label className="form-label">{t.tasks.task_title}</label>
             <input
               className="glass-input"
               placeholder={t.tasks.task_title_placeholder}
@@ -172,8 +144,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
           </div>
 
           {/* Description */}
-          <div>
-            <label style={labelStyle}>{t.tasks.description}</label>
+          <div className="form-field">
+            <label className="form-label">{t.tasks.description}</label>
             <textarea
               className="glass-input"
               placeholder={t.tasks.description_placeholder}
@@ -185,20 +157,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
           </div>
 
           {/* Category */}
-          <div>
-            <label style={labelStyle}>{t.tasks.category}</label>
-            <div style={{ display: 'flex', gap: 8 }}>
+          <div className="form-field">
+            <label className="form-label">{t.tasks.category}</label>
+            <div className="form-row-3">
               {categories.map(c => (
                 <button
                   key={c.value}
                   onClick={() => setCategory(c.value)}
+                  className="category-btn"
                   style={{
-                    flex: 1, padding: '8px', borderRadius: 10, fontSize: 13, fontWeight: 500,
-                    cursor: 'pointer', fontFamily: 'inherit',
                     background: category === c.value ? `${c.color}20` : 'var(--glass-bg-card)',
                     border: `1px solid ${category === c.value ? c.color : 'var(--glass-border)'}`,
                     color: category === c.value ? c.color : 'var(--text-secondary)',
-                    transition: 'all 0.2s',
                   }}
                 >
                   {c.label}
@@ -207,26 +177,34 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             </div>
           </div>
 
-          {/* Status + Priority row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div>
-              <label style={labelStyle}>{t.tasks.status}</label>
-              <select value={status} onChange={e => setStatus(e.target.value as TaskStatus)} style={selectStyle}>
+          {/* Status + Priority — stack on mobile */}
+          <div className="form-row-2">
+            <div className="form-field">
+              <label className="form-label">{t.tasks.status}</label>
+              <select
+                value={status}
+                onChange={e => setStatus(e.target.value as TaskStatus)}
+                className="glass-select"
+              >
                 {statuses.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
-            <div>
-              <label style={labelStyle}>{t.tasks.priority}</label>
-              <select value={priority} onChange={e => setPriority(e.target.value as Priority)} style={selectStyle}>
+            <div className="form-field">
+              <label className="form-label">{t.tasks.priority}</label>
+              <select
+                value={priority}
+                onChange={e => setPriority(e.target.value as Priority)}
+                className="glass-select"
+              >
                 {priorities.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
               </select>
             </div>
           </div>
 
-          {/* Due date + Estimated hours */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div>
-              <label style={labelStyle}>{t.tasks.due_date}</label>
+          {/* Due date + Hours — stack on mobile */}
+          <div className="form-row-2">
+            <div className="form-field">
+              <label className="form-label">{t.tasks.due_date}</label>
               <input
                 type="date"
                 className="glass-input"
@@ -234,23 +212,24 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
                 onChange={e => setDueDate(e.target.value)}
               />
             </div>
-            <div>
-              <label style={labelStyle}>{t.tasks.estimated_hours}</label>
+            <div className="form-field">
+              <label className="form-label">{t.tasks.estimated_hours}</label>
               <input
                 type="number"
                 className="glass-input"
                 value={estimatedHours}
                 onChange={e => setEstimatedHours(e.target.value)}
-                min="0" step="0.5"
+                min="0"
+                step="0.5"
                 placeholder="0"
               />
             </div>
           </div>
 
           {/* Tags */}
-          <div>
-            <label style={labelStyle}>{t.tasks.tags}</label>
-            <div style={{ display: 'flex', gap: 8, marginBottom: tags.length > 0 ? 8 : 0 }}>
+          <div className="form-field">
+            <label className="form-label">{t.tasks.tags}</label>
+            <div style={{ display: 'flex', gap: 8 }}>
               <input
                 className="glass-input"
                 placeholder={t.tasks.tags_placeholder}
@@ -264,7 +243,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
               </button>
             </div>
             {tags.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
                 {tags.map(tag => (
                   <span
                     key={tag}
@@ -283,14 +262,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
           </div>
 
           {/* Color */}
-          <div>
-            <label style={labelStyle}>{language === 'ru' ? 'Цвет метки' : 'Label color'}</label>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div className="form-field">
+            <label className="form-label">{language === 'ru' ? 'Цвет метки' : 'Label color'}</label>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <button
                 onClick={() => setColor('')}
                 style={{
-                  width: 24, height: 24, borderRadius: '50%', cursor: 'pointer',
-                  border: `2px solid ${!color ? 'var(--accent-blue)' : 'var(--glass-border)'}`,
+                  width: 26, height: 26, borderRadius: '50%', cursor: 'pointer', flexShrink: 0,
+                  border: `2px solid ${!color ? 'var(--accent-purple)' : 'var(--glass-border)'}`,
                   background: 'var(--glass-bg-card)',
                 }}
               />
@@ -299,9 +278,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
                   key={c}
                   onClick={() => setColor(c)}
                   style={{
-                    width: 24, height: 24, borderRadius: '50%', cursor: 'pointer',
+                    width: 26, height: 26, borderRadius: '50%', cursor: 'pointer', flexShrink: 0,
                     border: `2px solid ${color === c ? 'var(--text-primary)' : 'transparent'}`,
                     background: c,
+                    outline: color === c ? `2px solid ${c}` : 'none',
+                    outlineOffset: 2,
                   }}
                 />
               ))}
@@ -309,9 +290,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
           </div>
 
           {/* Checklist */}
-          <div>
-            <label style={labelStyle}>{t.tasks.checklist}</label>
-            <div style={{ display: 'flex', gap: 8, marginBottom: checklist.length > 0 ? 8 : 0 }}>
+          <div className="form-field">
+            <label className="form-label">{t.tasks.checklist}</label>
+            <div style={{ display: 'flex', gap: 8 }}>
               <input
                 className="glass-input"
                 placeholder={t.tasks.checklist_placeholder}
@@ -325,44 +306,46 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
               </button>
             </div>
             {checklist.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
                 {checklist.map(item => (
-                  <div
-                    key={item.id}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px',
-                      background: 'var(--glass-bg-card)', borderRadius: 8, border: '1px solid var(--glass-border)' }}
-                  >
+                  <div key={item.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
+                    background: 'var(--glass-bg-card)', borderRadius: 8, border: '1px solid var(--glass-border)',
+                  }}>
                     <button
-                      onClick={() => toggleCheck(item.id)}
+                      onClick={() => setChecklist(checklist.map(c => c.id === item.id ? { ...c, completed: !c.completed } : c))}
                       style={{
-                        width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--glass-border-strong)'}`,
+                        width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                        border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--glass-border-strong)'}`,
                         background: item.completed ? 'var(--accent-green)' : 'transparent',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                       }}
                     >
                       {item.completed && <Check size={11} color="#fff" />}
                     </button>
-                    <span style={{ flex: 1, fontSize: 13, color: item.completed ? 'var(--text-muted)' : 'var(--text-secondary)',
-                      textDecoration: item.completed ? 'line-through' : 'none' }}>
+                    <span style={{
+                      flex: 1, fontSize: 13,
+                      color: item.completed ? 'var(--text-muted)' : 'var(--text-secondary)',
+                      textDecoration: item.completed ? 'line-through' : 'none',
+                    }}>
                       {item.text}
                     </span>
-                    <button className="btn btn-ghost btn-icon" onClick={() => removeCheck(item.id)} style={{ padding: 4 }}>
-                      <Trash2 size={13} style={{ color: 'var(--accent-red)' }} />
+                    <button
+                      onClick={() => setChecklist(checklist.filter(c => c.id !== item.id))}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--accent-red)' }}
+                    >
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 ))}
               </div>
             )}
           </div>
+
         </div>
 
-        {/* Footer */}
-        <div style={{
-          display: 'flex', gap: 10, padding: '16px 24px',
-          borderTop: '1px solid var(--glass-border)',
-          justifyContent: 'flex-end',
-        }}>
+        {/* ── Footer ── */}
+        <div className="form-footer">
           <button className="btn btn-ghost" onClick={onClose}>{t.tasks.cancel}</button>
           <button
             className="btn btn-primary"
@@ -372,6 +355,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             {saving ? '...' : t.tasks.save}
           </button>
         </div>
+
       </div>
     </div>
   );
