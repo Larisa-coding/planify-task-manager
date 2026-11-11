@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { User, Briefcase, Star, Calendar, Plus, CheckCircle2, Circle } from 'lucide-react';
+import { User, Briefcase, Star, Calendar, Plus } from 'lucide-react';
 import { useTasks } from '../../hooks/useTasks';
 import { useLanguage } from '../../context/LanguageContext';
 import { Page } from '../../App';
@@ -162,7 +162,7 @@ type CatKey = 'personal' | 'work' | 'wishes';
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) => {
   const { tasks } = useTasks();
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
 
   const stats = useMemo(() => {
     const active = tasks.filter(t => !t.isDeleted);

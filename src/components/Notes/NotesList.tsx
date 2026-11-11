@@ -165,18 +165,8 @@ interface NoteCardProps {
 const NoteCard: React.FC<NoteCardProps> = ({
   note, language, formatDate, isConfirmingDelete, onEdit, onDelete,
 }) => {
-  const accent = note.color || 'var(--accent-purple)';
-  const accentRaw = note.color
-    ? note.color
-    : 'rgba(180,141,245,';
-
-  // Determine if color is a hex or CSS var and build a soft bg
-  const cardBg = note.color
-    ? `${note.color}18`
-    : 'var(--glass-bg-card)';
-  const borderColor = note.color
-    ? `${note.color}30`
-    : 'var(--glass-border)';
+  const cardBg = note.color ? `${note.color}18` : 'var(--glass-bg-card)';
+  const borderColor = note.color ? `${note.color}30` : 'var(--glass-border)';
 
   return (
     <div
