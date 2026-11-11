@@ -13,10 +13,11 @@ export const useTasks = (filters?: FilterOptions) => {
       setLoading(true);
       setError(null);
 
+      // Load all, then filter in JS (Dexie booleans can be tricky)
       let all = await db.tasks.orderBy('createdAt').toArray();
 
-      // Exclude soft-deleted (unless specifically requesting archived)
-      all = all.filter(t => !t.isDeleted);
+      // Exclude soft-deleted
+      all = all.filter(t => t.isDeleted !== true);
 
       if (filters?.status?.length) {
         all = all.filter(t => filters.status!.includes(t.status));
@@ -32,7 +33,7 @@ export const useTasks = (filters?: FilterOptions) => {
         all = all.filter(t =>
           t.title.toLowerCase().includes(q) ||
           t.description?.toLowerCase().includes(q) ||
-          t.tags.some(tag => tag.toLowerCase().includes(q))
+          (t.tags || []).some((tag: string) => tag.toLowerCase().includes(q))
         );
       }
       if (filters?.dueDate?.from) {
@@ -67,8 +68,8 @@ export const useTasks = (filters?: FilterOptions) => {
   };
 
   const deleteTask = async (id: string) => {
-    // Soft delete
-    await db.tasks.update(id, { isDeleted: true, deletedAt: new Date(), updatedAt: new Date() });
+    // Soft delete — mark isDeleted as true (boolean, not 0/1)
+    await db.tasks.update(id, { isDeleted: true, deletedAt: new Date(), updatedAt: new Date() } as any);
     await loadTasks();
   };
 
@@ -120,7 +121,6 @@ export const useAllTasksForArchive = () => {
     setTasks(all);
     setLoading(false);
   }, []);
-
   useEffect(() => { load(); }, [load]);
 
   const permanentDelete = async (id: string) => {

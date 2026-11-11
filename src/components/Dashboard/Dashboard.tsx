@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import { CheckCircle2, Clock, AlertCircle, TrendingUp, User, Briefcase, Star, ArrowRight, Plus } from 'lucide-react';
+import { User, Briefcase, Star, Calendar, Plus, CheckCircle2, Circle } from 'lucide-react';
 import { useTasks } from '../../hooks/useTasks';
 import { useLanguage } from '../../context/LanguageContext';
 import { Page } from '../../App';
 import { TaskCategory } from '../../types';
-import { format, isAfter, isBefore, addDays, isToday, isTomorrow } from 'date-fns';
+import { isBefore, isAfter, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 interface DashboardProps {
@@ -12,263 +13,440 @@ interface DashboardProps {
   onAddTask: (category?: TaskCategory) => void;
 }
 
-const categoryConfig = {
-  personal: { label: { ru: 'Личное', en: 'Personal' }, color: 'var(--accent-purple)', icon: <User size={16} />, page: 'personal' as Page },
-  work:     { label: { ru: 'Рабочее', en: 'Work' },    color: 'var(--accent-blue)',   icon: <Briefcase size={16} />, page: 'work' as Page },
-  wishes:   { label: { ru: 'Желания', en: 'Wishes' },  color: 'var(--accent-pink)',   icon: <Star size={16} />, page: 'wishes' as Page },
-};
+// ── Donut chart (pure SVG, no deps) ──────────────────────────────────────────
+interface DonutSlice { value: number; color: string; label: string }
 
-function getGreeting(lang: 'ru' | 'en'): string {
+function DonutChart({ slices, size = 120, thickness = 22 }: { slices: DonutSlice[]; size?: number; thickness?: number }) {
+  const total = slices.reduce((s, x) => s + x.value, 0);
+  const r = (size - thickness) / 2;
+  const cx = size / 2;
+  const cy = size / 2;
+  const circumference = 2 * Math.PI * r;
+
+  if (total === 0) {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--glass-border-strong)" strokeWidth={thickness} />
+        <text x={cx} y={cy + 5} textAnchor="middle" fill="var(--text-muted)" fontSize="12">0</text>
+      </svg>
+    );
+  }
+
+  let offset = 0;
+  const paths = slices.filter(s => s.value > 0).map((slice, i) => {
+    const pct = slice.value / total;
+    const dash = pct * circumference;
+    const gap = circumference - dash;
+    const rotation = (offset / total) * 360 - 90;
+    offset += slice.value;
+    return (
+      <circle
+        key={i}
+        cx={cx} cy={cy} r={r}
+        fill="none"
+        stroke={slice.color}
+        strokeWidth={thickness}
+        strokeDasharray={`${dash} ${gap}`}
+        strokeDashoffset={0}
+        transform={`rotate(${rotation} ${cx} ${cy})`}
+        strokeLinecap="butt"
+        style={{ transition: 'stroke-dasharray 0.6s ease' }}
+      />
+    );
+  });
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Track */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--glass-border)" strokeWidth={thickness} />
+      {paths}
+      {/* Center number */}
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text-primary)" fontSize="18" fontWeight="700" fontFamily="Inter, sans-serif">
+        {total}
+      </text>
+      <text x={cx} y={cy + 10} textAnchor="middle" fill="var(--text-muted)" fontSize="10" fontFamily="Inter, sans-serif">
+        total
+      </text>
+    </svg>
+  );
+}
+
+// ── Completion donut ──────────────────────────────────────────────────────────
+function CompletionDonut({ done, total, size = 120, thickness = 22 }: { done: number; total: number; size?: number; thickness?: number }) {
+  const r = (size - thickness) / 2;
+  const cx = size / 2;
+  const cy = size / 2;
+  const circumference = 2 * Math.PI * r;
+  const pct = total > 0 ? done / total : 0;
+  const dash = pct * circumference;
+  const pctLabel = total > 0 ? Math.round(pct * 100) : 0;
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--glass-border)" strokeWidth={thickness} />
+      <circle
+        cx={cx} cy={cy} r={r}
+        fill="none"
+        stroke="var(--accent-green)"
+        strokeWidth={thickness}
+        strokeDasharray={`${dash} ${circumference - dash}`}
+        strokeDashoffset={0}
+        transform={`rotate(-90 ${cx} ${cy})`}
+        strokeLinecap="butt"
+        style={{ transition: 'stroke-dasharray 0.6s ease' }}
+      />
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text-primary)" fontSize="18" fontWeight="700" fontFamily="Inter, sans-serif">
+        {pctLabel}%
+      </text>
+      <text x={cx} y={cy + 10} textAnchor="middle" fill="var(--text-muted)" fontSize="10" fontFamily="Inter, sans-serif">
+        done
+      </text>
+    </svg>
+  );
+}
+
+function getGreeting(lang: 'ru' | 'en') {
   const h = new Date().getHours();
   if (lang === 'ru') {
     if (h >= 5 && h < 12) return 'Доброе утро';
     if (h >= 12 && h < 17) return 'Добрый день';
     if (h >= 17 && h < 22) return 'Добрый вечер';
     return 'Доброй ночи';
-  } else {
-    if (h >= 5 && h < 12) return 'Good morning';
-    if (h >= 12 && h < 17) return 'Good afternoon';
-    if (h >= 17 && h < 22) return 'Good evening';
-    return 'Good night';
   }
+  if (h >= 5 && h < 12) return 'Good morning';
+  if (h >= 12 && h < 17) return 'Good afternoon';
+  if (h >= 17 && h < 22) return 'Good evening';
+  return 'Good night';
 }
 
-function getDueDateLabel(date: Date, lang: 'ru' | 'en'): { text: string; color: string } {
-  const now = new Date();
-  if (isBefore(date, now)) return { text: lang === 'ru' ? 'Просрочено' : 'Overdue', color: 'var(--accent-red)' };
-  if (isToday(date)) return { text: lang === 'ru' ? 'Сегодня' : 'Today', color: 'var(--accent-orange)' };
-  if (isTomorrow(date)) return { text: lang === 'ru' ? 'Завтра' : 'Tomorrow', color: 'var(--accent-orange)' };
-  return {
-    text: format(date, lang === 'ru' ? 'd MMM' : 'MMM d', { locale: lang === 'ru' ? ru : undefined }),
-    color: 'var(--text-secondary)',
-  };
-}
+const CAT_CONFIG = {
+  personal: {
+    label: { ru: 'Личное',   en: 'Personal' },
+    sublabel: { ru: 'Личные задачи', en: 'Personal tasks' },
+    color: 'var(--accent-purple)',
+    colorRaw: 'rgba(180,141,245,',
+    icon: <User size={22} />,
+    page: 'personal' as Page,
+    emoji: '🌿',
+  },
+  work: {
+    label: { ru: 'Рабочее',  en: 'Work' },
+    sublabel: { ru: 'Рабочие задачи', en: 'Work tasks' },
+    color: 'var(--accent-teal)',
+    colorRaw: 'rgba(94,196,184,',
+    icon: <Briefcase size={22} />,
+    page: 'work' as Page,
+    emoji: '💼',
+  },
+  wishes: {
+    label: { ru: 'Желания',  en: 'Wishes' },
+    sublabel: { ru: 'Мечты и желания', en: 'Dreams & wishes' },
+    color: 'var(--accent-rose)',
+    colorRaw: 'rgba(245,137,176,',
+    icon: <Star size={22} />,
+    page: 'wishes' as Page,
+    emoji: '✨',
+  },
+  calendar: {
+    label: { ru: 'Календарь', en: 'Calendar' },
+    sublabel: { ru: 'Дедлайны задач', en: 'Task deadlines' },
+    color: 'var(--accent-orange)',
+    colorRaw: 'rgba(224,160,96,',
+    icon: <Calendar size={22} />,
+    page: 'calendar' as Page,
+    emoji: '📅',
+  },
+} as const;
+
+type CatKey = 'personal' | 'work' | 'wishes';
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) => {
   const { tasks } = useTasks();
   const { language, t } = useLanguage();
 
   const stats = useMemo(() => {
-    const active = tasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled');
-    const completed = tasks.filter(t => t.status === 'completed');
+    const active = tasks.filter(t => !t.isDeleted);
+    const completed = active.filter(t => t.status === 'completed');
     const now = new Date();
-    const overdue = active.filter(t => t.dueDate && isBefore(t.dueDate, now));
-    const inProgress = active.filter(t => t.status === 'in_progress');
-    const completionRate = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
-
     const upcoming = active
-      .filter(t => t.dueDate && isAfter(t.dueDate, now) && isBefore(t.dueDate, addDays(now, 4)))
-      .sort((a, b) => (a.dueDate!.getTime() - b.dueDate!.getTime()));
+      .filter(t => t.dueDate && t.status !== 'completed' && isAfter(t.dueDate, now) && isBefore(t.dueDate, addDays(now, 4)))
+      .sort((a, b) => a.dueDate!.getTime() - b.dueDate!.getTime());
+    const overdue = active.filter(t => t.dueDate && t.status !== 'completed' && isBefore(t.dueDate, now));
 
-    const byCategory = {
-      personal: active.filter(t => t.category === 'personal').length,
-      work: active.filter(t => t.category === 'work').length,
-      wishes: active.filter(t => t.category === 'wishes').length,
+    const byCategory: Record<CatKey, { total: number; completed: number }> = {
+      personal: { total: active.filter(t => t.category === 'personal').length, completed: completed.filter(t => t.category === 'personal').length },
+      work:     { total: active.filter(t => t.category === 'work').length,     completed: completed.filter(t => t.category === 'work').length },
+      wishes:   { total: active.filter(t => t.category === 'wishes').length,   completed: completed.filter(t => t.category === 'wishes').length },
     };
 
-    const recent = [...tasks]
-      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-      .slice(0, 5);
-
-    return { active, completed, overdue, inProgress, completionRate, upcoming, byCategory, recent, total: tasks.length };
+    return { active, completed, upcoming, overdue, byCategory, total: active.length };
   }, [tasks]);
 
-  const statCards = [
-    {
-      label: t.dashboard.total_tasks,
-      value: stats.total,
-      icon: <TrendingUp size={18} />,
-      color: 'var(--accent-blue)',
-    },
-    {
-      label: t.dashboard.completed,
-      value: stats.completed.length,
-      icon: <CheckCircle2 size={18} />,
-      color: 'var(--accent-green)',
-    },
-    {
-      label: t.dashboard.in_progress,
-      value: stats.inProgress.length,
-      icon: <Clock size={18} />,
-      color: 'var(--accent-orange)',
-    },
-    {
-      label: t.dashboard.overdue,
-      value: stats.overdue.length,
-      icon: <AlertCircle size={18} />,
-      color: stats.overdue.length > 0 ? 'var(--accent-red)' : 'var(--text-muted)',
-    },
+  const donutSlices: DonutSlice[] = [
+    { value: stats.byCategory.personal.total - stats.byCategory.personal.completed, color: 'var(--accent-purple)', label: 'Personal' },
+    { value: stats.byCategory.work.total - stats.byCategory.work.completed,         color: 'var(--accent-teal)',   label: 'Work' },
+    { value: stats.byCategory.wishes.total - stats.byCategory.wishes.completed,     color: 'var(--accent-rose)',   label: 'Wishes' },
   ];
 
+  const activeTotalForDonut = donutSlices.reduce((s, x) => s + x.value, 0);
+
+  const formatDue = (d: Date) => {
+    const now = new Date();
+    if (isBefore(d, now)) return { label: language === 'ru' ? 'Просрочено' : 'Overdue', color: 'var(--accent-red)' };
+    const diff = Math.ceil((d.getTime() - now.getTime()) / 86400000);
+    if (diff === 0) return { label: language === 'ru' ? 'Сегодня' : 'Today', color: 'var(--accent-orange)' };
+    if (diff === 1) return { label: language === 'ru' ? 'Завтра' : 'Tomorrow', color: 'var(--accent-orange)' };
+    return { label: format(d, language === 'ru' ? 'd MMM' : 'MMM d', { locale: language === 'ru' ? ru : undefined }), color: 'var(--text-muted)' };
+  };
+
   return (
-    <div style={{ maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ maxWidth: 860, display: 'flex', flexDirection: 'column', gap: 20 }}>
+
       {/* Greeting */}
-      <div className="glass-card" style={{ padding: '24px 28px', position: 'relative', overflow: 'hidden' }}>
-        {/* Decorative blobs */}
-        <div style={{
-          position: 'absolute', top: -40, right: -40,
-          width: 160, height: 160,
-          background: 'radial-gradient(circle, rgba(88,166,255,0.12) 0%, transparent 70%)',
-          borderRadius: '50%', pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: -20, left: 60,
-          width: 120, height: 120,
-          background: 'radial-gradient(circle, rgba(163,113,247,0.1) 0%, transparent 70%)',
-          borderRadius: '50%', pointerEvents: 'none',
-        }} />
-
-        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 4 }}>
-          {getGreeting(language)} 👋
-        </p>
-        <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-          {t.dashboard.subtitle}
+      <div style={{ paddingLeft: 4 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 2 }}>{getGreeting(language)} 👋</p>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+          {language === 'ru' ? 'Что сегодня запланировано?' : "What's planned today?"}
         </h2>
-
-        {/* Completion progress */}
-        <div style={{ marginTop: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t.dashboard.completion_rate}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent-blue)' }}>{stats.completionRate}%</span>
-          </div>
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${stats.completionRate}%` }} />
-          </div>
-        </div>
       </div>
 
-      {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
-        {statCards.map(card => (
-          <div key={card.label} className="stat-card">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 34, height: 34, borderRadius: 10,
-                  background: `${card.color}20`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: card.color,
-                }}
-              >
-                {card.icon}
-              </div>
-              <span style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
-                {card.value}
-              </span>
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{card.label}</div>
-          </div>
-        ))}
-      </div>
+      {/* 4 big square tiles */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+        {(['personal', 'work', 'wishes', 'calendar'] as const).map(key => {
+          const cfg = CAT_CONFIG[key];
+          const catStats = key !== 'calendar' ? stats.byCategory[key as CatKey] : null;
+          const activeCat = catStats ? catStats.total - catStats.completed : null;
+          const isAction = key !== 'calendar';
 
-      {/* Category cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-        {(Object.entries(categoryConfig) as [TaskCategory, typeof categoryConfig.personal][]).map(([key, cfg]) => (
-          <button
-            key={key}
-            className="glass-card"
-            onClick={() => onNavigate(cfg.page)}
-            style={{ padding: '16px', textAlign: 'left', cursor: 'pointer', border: 'none', width: '100%' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          return (
+            <div
+              key={key}
+              role="button"
+              tabIndex={0}
+              onClick={() => onNavigate(cfg.page)}
+              onKeyDown={e => e.key === 'Enter' && onNavigate(cfg.page)}
+              style={{
+                background: 'var(--glass-bg-card)',
+                backdropFilter: 'blur(20px) saturate(1.8)',
+                WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: 20,
+                padding: '24px 22px',
+                cursor: 'pointer',
+                transition: 'all 0.22s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                minHeight: 160,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+              className="dashboard-tile"
+            >
+              {/* Soft glow blob */}
               <div style={{
-                width: 30, height: 30, borderRadius: 8,
-                background: `${cfg.color}20`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: cfg.color,
-              }}>
-                {cfg.icon}
+                position: 'absolute', top: -30, right: -30,
+                width: 120, height: 120,
+                background: `radial-gradient(circle, ${cfg.colorRaw}0.18) 0%, transparent 70%)`,
+                borderRadius: '50%', pointerEvents: 'none',
+              }} />
+
+              {/* Top row: icon + add button */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 14,
+                  background: `${cfg.colorRaw}0.14)`,
+                  border: `1px solid ${cfg.colorRaw}0.22)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: cfg.color,
+                }}>
+                  {cfg.icon}
+                </div>
+
+                {isAction && (
+                  <button
+                    onClick={e => { e.stopPropagation(); onAddTask(key as TaskCategory); }}
+                    style={{
+                      width: 30, height: 30, borderRadius: 9,
+                      background: `${cfg.colorRaw}0.14)`,
+                      border: `1px solid ${cfg.colorRaw}0.22)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', color: cfg.color,
+                    }}
+                    aria-label={`Add ${key} task`}
+                  >
+                    <Plus size={15} />
+                  </button>
+                )}
               </div>
-              <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
+
+              {/* Bottom: label + count */}
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 2 }}>
+                  {activeCat !== null ? activeCat : (stats.upcoming.length + stats.overdue.length)}
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                  {cfg.label[language]}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  {key === 'calendar'
+                    ? (language === 'ru' ? `${stats.upcoming.length} скоро, ${stats.overdue.length} просрочено` : `${stats.upcoming.length} soon, ${stats.overdue.length} overdue`)
+                    : (language === 'ru' ? `${catStats?.completed ?? 0} выполнено` : `${catStats?.completed ?? 0} completed`)}
+                </div>
+              </div>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
-              {stats.byCategory[key]}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              {cfg.label[language]}
-            </div>
-          </button>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Bottom row: upcoming + recent */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        {/* Upcoming deadlines */}
-        <div className="glass-card" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t.dashboard.upcoming}</h3>
-            <AlertCircle size={15} style={{ color: 'var(--accent-orange)' }} />
-          </div>
-          {stats.upcoming.length === 0 ? (
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{t.dashboard.no_upcoming}</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {stats.upcoming.slice(0, 4).map(task => {
-                const dl = getDueDateLabel(task.dueDate!, language);
+      {/* Charts row */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+
+        {/* Category donut */}
+        <div
+          style={{
+            background: 'var(--glass-bg-card)',
+            backdropFilter: 'blur(20px) saturate(1.8)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            border: '1px solid var(--glass-border)',
+            borderRadius: 20,
+            padding: '20px 24px',
+          }}
+        >
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {language === 'ru' ? 'По категориям' : 'By category'}
+          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <DonutChart slices={donutSlices} size={110} thickness={18} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+              {(['personal', 'work', 'wishes'] as CatKey[]).map(cat => {
+                const cfg = CAT_CONFIG[cat];
+                const val = stats.byCategory[cat].total - stats.byCategory[cat].completed;
+                const pct = activeTotalForDonut > 0 ? Math.round((val / activeTotalForDonut) * 100) : 0;
                 return (
-                  <div key={task.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {task.title}
-                    </span>
-                    <span style={{ fontSize: 11, color: dl.color, fontWeight: 600, flexShrink: 0 }}>{dl.text}</span>
+                  <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: cfg.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', flex: 1 }}>{cfg.label[language]}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>{val}</span>
+                    <span style={{ fontSize: 10, color: 'var(--text-muted)', minWidth: 28, textAlign: 'right' }}>{pct}%</span>
                   </div>
                 );
               })}
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Recent tasks */}
-        <div className="glass-card" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t.dashboard.recent_tasks}</h3>
-            <button
-              onClick={() => onNavigate('tasks')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent-blue)', fontSize: 12, fontWeight: 500 }}
-            >
-              {language === 'ru' ? 'Все →' : 'All →'}
-            </button>
+        {/* Completion donut */}
+        <div
+          style={{
+            background: 'var(--glass-bg-card)',
+            backdropFilter: 'blur(20px) saturate(1.8)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            border: '1px solid var(--glass-border)',
+            borderRadius: 20,
+            padding: '20px 24px',
+          }}
+        >
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {language === 'ru' ? 'Выполнение' : 'Completion'}
+          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <CompletionDonut done={stats.completed.length} total={stats.total} size={110} thickness={18} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-green)', flexShrink: 0 }} />
+                <span style={{ fontSize: 12, color: 'var(--text-secondary)', flex: 1 }}>{language === 'ru' ? 'Выполнено' : 'Completed'}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>{stats.completed.length}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--glass-border-strong)', flexShrink: 0 }} />
+                <span style={{ fontSize: 12, color: 'var(--text-secondary)', flex: 1 }}>{language === 'ru' ? 'Активных' : 'Active'}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>{stats.total - stats.completed.length}</span>
+              </div>
+              {stats.overdue.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-red)', flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, color: 'var(--accent-red)', flex: 1 }}>{language === 'ru' ? 'Просрочено' : 'Overdue'}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent-red)' }}>{stats.overdue.length}</span>
+                </div>
+              )}
+            </div>
           </div>
-          {stats.recent.length === 0 ? (
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{t.dashboard.no_tasks}</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {stats.recent.map(task => (
-                <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{
-                    width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
-                    background: task.status === 'completed' ? 'var(--accent-green)'
-                      : task.status === 'in_progress' ? 'var(--accent-blue)'
-                      : 'var(--text-muted)',
-                  }} />
-                  <span style={{
-                    fontSize: 13, color: task.status === 'completed' ? 'var(--text-muted)' : 'var(--text-secondary)',
-                    flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    textDecoration: task.status === 'completed' ? 'line-through' : 'none',
-                  }}>
+        </div>
+      </div>
+
+      {/* Upcoming deadlines strip — only if there are any */}
+      {stats.upcoming.length > 0 && (
+        <div
+          style={{
+            background: 'var(--glass-bg-card)',
+            backdropFilter: 'blur(20px) saturate(1.8)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            border: '1px solid var(--glass-border)',
+            borderRadius: 20,
+            padding: '18px 22px',
+          }}
+        >
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {language === 'ru' ? 'Скоро дедлайн' : 'Upcoming deadlines'}
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {stats.upcoming.slice(0, 4).map(task => {
+              const due = formatDue(task.dueDate!);
+              const catCfg = CAT_CONFIG[task.category];
+              return (
+                <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: catCfg.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {task.title}
                   </span>
+                  <span style={{ fontSize: 11, color: due.color, fontWeight: 600, flexShrink: 0 }}>{due.label}</span>
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Quick add buttons */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {(Object.entries(categoryConfig) as [TaskCategory, typeof categoryConfig.personal][]).map(([key, cfg]) => (
-          <button
-            key={key}
-            className="btn btn-ghost"
-            onClick={() => onAddTask(key)}
-            style={{ fontSize: 13 }}
-          >
-            <Plus size={14} style={{ color: cfg.color }} />
-            {cfg.label[language]}
-          </button>
-        ))}
-      </div>
+      {/* Empty state */}
+      {stats.total === 0 && (
+        <div style={{
+          background: 'var(--glass-bg-card)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: 20,
+          padding: '36px 24px',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>✨</div>
+          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+            {language === 'ru' ? 'Начните с первой задачи' : 'Start with your first task'}
+          </p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+            {language === 'ru' ? 'Добавьте личное, рабочее задание или желание' : 'Add a personal, work task, or a wish'}
+          </p>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {(['personal', 'work', 'wishes'] as CatKey[]).map(cat => {
+              const cfg = CAT_CONFIG[cat];
+              return (
+                <button
+                  key={cat}
+                  onClick={() => onAddTask(cat)}
+                  style={{
+                    padding: '9px 18px', borderRadius: 12, fontSize: 13, fontWeight: 500,
+                    cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 7,
+                    background: `${cfg.colorRaw}0.12)`,
+                    border: `1px solid ${cfg.colorRaw}0.22)`,
+                    color: cfg.color,
+                  }}
+                >
+                  <Plus size={14} /> {cfg.label[language]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

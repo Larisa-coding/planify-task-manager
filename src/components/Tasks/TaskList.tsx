@@ -18,8 +18,8 @@ interface TaskListProps {
 
 const categoryColors: Record<TaskCategory, string> = {
   personal: 'var(--accent-purple)',
-  work: 'var(--accent-blue)',
-  wishes: 'var(--accent-pink)',
+  work: 'var(--accent-teal)',
+  wishes: 'var(--accent-rose)',
 };
 
 const categoryIcons: Record<TaskCategory, React.ReactNode> = {
