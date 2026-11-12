@@ -1,7 +1,7 @@
 {
   "name": "task-manager-pro",
   "version": "1.0.0",
-  "description": "Planify — личный планировщик задач с категориями, календарём, заметками и аналитикой",
+  "description": "Planify — личный планировщик задач: личное, работа и желания",
   "private": true,
   "dependencies": {
     "@types/node": "^20.0.0",

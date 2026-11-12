@@ -1,7 +1,7 @@
 {
-  "short_name": "TaskManager Pro",
-  "name": "TaskManager Pro - Менеджер задач",
-  "description": "Профессиональный менеджер задач с расширенным функционалом",
+  "short_name": "Planify",
+  "name": "Planify — планировщик задач",
+  "description": "Личные дела, рабочие задачи и желания. Календарь, архив и аналитика. Данные остаются на устройстве.",
   "icons": [
     {
       "src": "favicon.ico",
