@@ -13,7 +13,6 @@ interface DashboardProps {
   onAddTask: (category?: TaskCategory) => void;
 }
 
-// ── Donut chart (pure SVG, no deps) ──────────────────────────────────────────
 interface DonutSlice { value: number; color: string; label: string }
 
 function DonutChart({ slices, size = 120, thickness = 22 }: { slices: DonutSlice[]; size?: number; thickness?: number }) {
@@ -57,21 +56,18 @@ function DonutChart({ slices, size = 120, thickness = 22 }: { slices: DonutSlice
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {/* Track */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--glass-border)" strokeWidth={thickness} />
       {paths}
-      {/* Center number */}
-      <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text-primary)" fontSize="18" fontWeight="700" fontFamily="Inter, sans-serif">
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text-primary)" fontSize="18" fontWeight="700" fontFamily="Nunito, sans-serif">
         {total}
       </text>
-      <text x={cx} y={cy + 10} textAnchor="middle" fill="var(--text-muted)" fontSize="10" fontFamily="Inter, sans-serif">
+      <text x={cx} y={cy + 10} textAnchor="middle" fill="var(--text-muted)" fontSize="10" fontFamily="Nunito, sans-serif">
         total
       </text>
     </svg>
   );
 }
 
-// ── Completion donut ──────────────────────────────────────────────────────────
 function CompletionDonut({ done, total, size = 120, thickness = 22 }: { done: number; total: number; size?: number; thickness?: number }) {
   const r = (size - thickness) / 2;
   const cx = size / 2;
@@ -95,10 +91,10 @@ function CompletionDonut({ done, total, size = 120, thickness = 22 }: { done: nu
         strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.6s ease' }}
       />
-      <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text-primary)" fontSize="18" fontWeight="700" fontFamily="Inter, sans-serif">
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text-primary)" fontSize="18" fontWeight="700" fontFamily="Nunito, sans-serif">
         {pctLabel}%
       </text>
-      <text x={cx} y={cy + 10} textAnchor="middle" fill="var(--text-muted)" fontSize="10" fontFamily="Inter, sans-serif">
+      <text x={cx} y={cy + 10} textAnchor="middle" fill="var(--text-muted)" fontSize="10" fontFamily="Nunito, sans-serif">
         done
       </text>
     </svg>
@@ -202,7 +198,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
   return (
     <div style={{ maxWidth: 860, width: '100%', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* Greeting */}
       <div style={{ paddingLeft: 4 }}>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 2 }}>{getGreeting(language)} 👋</p>
         <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
@@ -210,7 +205,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
         </h2>
       </div>
 
-      {/* 4 big square tiles */}
       <div className="dashboard-tiles">
         {(['personal', 'work', 'wishes', 'calendar'] as const).map(key => {
           const cfg = CAT_CONFIG[key];
@@ -243,7 +237,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
               }}
               className="dashboard-tile"
             >
-              {/* Soft glow blob */}
               <div style={{
                 position: 'absolute', top: -30, right: -30,
                 width: 120, height: 120,
@@ -251,7 +244,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
                 borderRadius: '50%', pointerEvents: 'none',
               }} />
 
-              {/* Top row: icon + add button */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 14,
@@ -280,7 +272,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
                 )}
               </div>
 
-              {/* Bottom: label + count */}
               <div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 2 }}>
                   {activeCat !== null ? activeCat : (stats.upcoming.length + stats.overdue.length)}
@@ -299,10 +290,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
         })}
       </div>
 
-      {/* Charts row */}
       <div className="dashboard-charts">
 
-        {/* Category donut */}
         <div
           style={{
             background: 'var(--glass-bg-card)',
@@ -336,7 +325,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
           </div>
         </div>
 
-        {/* Completion donut */}
         <div
           style={{
             background: 'var(--glass-bg-card)',
@@ -375,7 +363,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
         </div>
       </div>
 
-      {/* Upcoming deadlines strip — only if there are any */}
       {stats.upcoming.length > 0 && (
         <div
           style={{
@@ -408,7 +395,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onAddTask }) =
         </div>
       )}
 
-      {/* Empty state */}
       {stats.total === 0 && (
         <div style={{
           background: 'var(--glass-bg-card)',

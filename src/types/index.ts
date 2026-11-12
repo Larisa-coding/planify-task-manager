@@ -4,13 +4,6 @@ export type TaskStatus = 'new' | 'in_progress' | 'completed' | 'cancelled';
 
 export type Priority = 'low' | 'medium' | 'high' | 'urgent';
 
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: Date;
-}
-
 export interface Task {
   id: string;
   title: string;
@@ -26,16 +19,6 @@ export interface Task {
   isDeleted?: boolean;
   tags: string[];
   color?: string;
-  checklist?: ChecklistItem[];
   estimatedHours?: number;
   actualHours?: number;
-}
-
-export interface FilterOptions {
-  status?: TaskStatus[];
-  priority?: Priority[];
-  category?: TaskCategory[];
-  dueDate?: { from?: Date; to?: Date };
-  tags?: string[];
-  search?: string;
 }

@@ -1,5 +1,3 @@
-import { Task } from '../types';
-
 const DB_NAMES = ['PlanifyDB', 'TaskManagerDB_v3', 'TaskManagerDB_v2', 'TaskManagerDB'];
 
 type ReadResult = { rows: unknown[]; complete: boolean };
@@ -26,8 +24,7 @@ function readDatabase(name: string, timeoutMs: number): Promise<ReadResult> {
         finish([], false);
       };
       request.onupgradeneeded = () => {
-        // Database does not exist yet. Abort so we don't create an empty one.
-        try { request.transaction?.abort(); } catch { /* ignore */ }
+        try { request.transaction?.abort(); } catch { /* база ещё не создана */ }
         window.clearTimeout(timer);
         finish([], true);
       };
@@ -65,7 +62,6 @@ function readDatabase(name: string, timeoutMs: number): Promise<ReadResult> {
   });
 }
 
-/** One-time read of tasks left in IndexedDB. Never writes. */
 export async function readLegacyIndexedDbTasks(): Promise<{ rows: unknown[]; complete: boolean }> {
   const batches = await Promise.all(DB_NAMES.map((name) => readDatabase(name, 1500)));
   return {
@@ -73,5 +69,3 @@ export async function readLegacyIndexedDbTasks(): Promise<{ rows: unknown[]; com
     complete: batches.every((batch) => batch.complete),
   };
 }
-
-export type { Task };

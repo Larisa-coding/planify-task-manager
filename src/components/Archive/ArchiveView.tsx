@@ -59,7 +59,6 @@ export default function ArchiveView({ onEditTask }: ArchiveViewProps) {
 
   return (
     <div style={{ maxWidth: 800, width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Header */}
       <div className="glass-card" style={{ padding: '20px 24px' }}>
         <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
           {t.archive.title}
@@ -67,7 +66,6 @@ export default function ArchiveView({ onEditTask }: ArchiveViewProps) {
         <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{t.archive.subtitle}</p>
       </div>
 
-      {/* Filter */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         {filterButtons.map(btn => (
           <button
@@ -89,7 +87,6 @@ export default function ArchiveView({ onEditTask }: ArchiveViewProps) {
         </span>
       </div>
 
-      {/* List */}
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
           <div className="app-spinner" />
@@ -136,14 +133,12 @@ function ArchiveRow({ task, language, formatDate, formatDuration, t, catColors, 
 
   return (
     <div className="glass-card" style={{ padding: '16px 18px', display: 'flex', alignItems: 'flex-start', gap: 14, borderLeftWidth: 3, borderLeftColor: color, opacity: task.isDeleted ? 0.75 : 1 }}>
-      {/* Icon */}
       <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--glass-bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
         {isCompleted
           ? <CheckCircle2 size={18} style={{ color: 'var(--accent-green)' }} />
           : <XCircle size={18} style={{ color: 'var(--accent-red)' }} />}
       </div>
 
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6, textDecoration: isCompleted ? 'line-through' : 'none', opacity: isCompleted ? 0.7 : 1 }}>
           {task.title}
@@ -177,7 +172,6 @@ function ArchiveRow({ task, language, formatDate, formatDuration, t, catColors, 
         </div>
       </div>
 
-      {/* Actions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
         <button className="btn btn-success btn-sm" onClick={onRestore} title={t.archive.restore}>
           <RotateCcw size={13} />

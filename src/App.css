@@ -4,17 +4,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap');
 
-/* =============================================
-   CSS VARIABLES — DARK & LIGHT THEMES
-   ============================================= */
-
 :root[data-theme='dark'],
 :root.dark {
   --bg-primary: #111214;
   --bg-secondary: #18191c;
   --bg-tertiary: #1e2024;
 
-  /* Matte frosted glass — less transparent, more opaque/milky */
   --glass-bg: rgba(28, 29, 33, 0.82);
   --glass-bg-hover: rgba(34, 36, 42, 0.90);
   --glass-bg-card: rgba(255, 255, 255, 0.055);
@@ -29,15 +24,14 @@
   --text-muted: #464b55;
   --text-accent: #c4c8d0;
 
-  /* Neutral, desaturated accents — no dominant blue */
-  --accent-primary: #c4c8d0;      /* neutral silver — main CTA */
-  --accent-purple: #b48df5;       /* soft lavender — personal */
-  --accent-teal: #5ec4b8;         /* teal — work */
-  --accent-rose: #f589b0;         /* rose — wishes */
+  --accent-primary: #c4c8d0;
+  --accent-purple: #b48df5;
+  --accent-teal: #5ec4b8;
+  --accent-rose: #f589b0;
   --accent-green: #5cb87a;
   --accent-orange: #e0a060;
   --accent-red: #e06060;
-  --accent-blue: #7ab3f0;         /* kept for calendar/links, desaturated */
+  --accent-blue: #7ab3f0;
 
   --sidebar-width: 260px;
   --header-height: 64px;
@@ -52,7 +46,6 @@
   --bg-secondary: #eaecf2;
   --bg-tertiary: #e2e5ee;
 
-  /* Milky frosted glass for light theme */
   --glass-bg: rgba(255, 255, 255, 0.78);
   --glass-bg-hover: rgba(255, 255, 255, 0.92);
   --glass-bg-card: rgba(255, 255, 255, 0.65);
@@ -83,7 +76,6 @@
   --gradient-accent: linear-gradient(135deg, rgba(124,82,217,0.07) 0%, rgba(42,157,143,0.05) 100%);
 }
 
-/* Default to dark */
 :root {
   --bg-primary: #111214;
   --bg-secondary: #18191c;
@@ -114,10 +106,6 @@
   --gradient-accent: linear-gradient(135deg, rgba(180,141,245,0.08) 0%, rgba(94,196,184,0.06) 100%);
 }
 
-/* =============================================
-   BASE
-   ============================================= */
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -138,10 +126,6 @@ body {
   min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
-/* =============================================
-   GLASSMORPHISM COMPONENTS
-   ============================================= */
 
 .glass {
   background: var(--glass-bg);
@@ -205,10 +189,6 @@ body {
   border-color: var(--accent-purple);
   box-shadow: 0 0 0 3px rgba(124, 82, 217, 0.10);
 }
-
-/* =============================================
-   BUTTONS
-   ============================================= */
 
 .btn {
   display: inline-flex;
@@ -298,10 +278,6 @@ body {
   line-height: 1;
 }
 
-/* =============================================
-   BADGES
-   ============================================= */
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -313,7 +289,6 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* Category badges */
 .badge-personal {
   background: rgba(180, 141, 245, 0.15);
   color: var(--accent-purple);
@@ -345,7 +320,6 @@ body {
   color: var(--accent-rose);
 }
 
-/* Priority badges */
 .badge-low {
   background: rgba(63, 185, 80, 0.12);
   color: var(--accent-green);
@@ -371,7 +345,6 @@ body {
   animation: pulse-badge 2s ease infinite;
 }
 
-/* Status badges */
 .badge-new {
   background: rgba(139, 148, 158, 0.12);
   color: var(--text-secondary);
@@ -395,10 +368,6 @@ body {
   color: var(--text-muted);
   border: 1px solid rgba(248, 81, 73, 0.15);
 }
-
-/* =============================================
-   MODAL
-   ============================================= */
 
 .modal-overlay {
   position: fixed;
@@ -438,10 +407,6 @@ body {
   box-shadow: 0 24px 80px rgba(60, 80, 140, 0.2), 0 0 0 1px rgba(0,0,0,0.04);
 }
 
-/* =============================================
-   ANIMATIONS
-   ============================================= */
-
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -471,10 +436,6 @@ body {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* =============================================
-   SCROLLBAR
-   ============================================= */
-
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -489,10 +450,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
-
-/* =============================================
-   UTILITY
-   ============================================= */
 
 .text-primary   { color: var(--text-primary) !important; }
 .text-secondary { color: var(--text-secondary) !important; }
@@ -515,7 +472,6 @@ body {
   overflow: hidden;
 }
 
-/* Transitions for theme change */
 *,
 *::before,
 *::after {
@@ -524,15 +480,10 @@ body {
   transition-timing-function: ease;
 }
 
-/* Override transition for things that shouldn't animate */
 .no-transition,
 .no-transition * {
   transition: none !important;
 }
-
-/* =============================================
-   PROGRESS BAR
-   ============================================= */
 
 .progress-bar {
   background: var(--glass-bg-card);
@@ -547,10 +498,6 @@ body {
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-teal));
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-/* =============================================
-   STAT CARDS
-   ============================================= */
 
 .stat-card {
   background: var(--glass-bg-card);
@@ -581,10 +528,6 @@ body {
   box-shadow: var(--glass-shadow-hover);
 }
 
-/* =============================================
-   TASK ITEM
-   ============================================= */
-
 .task-item {
   background: var(--glass-bg-card);
   border: 1px solid var(--glass-border);
@@ -610,10 +553,6 @@ body {
   text-decoration: line-through;
   color: var(--text-muted);
 }
-
-/* =============================================
-   CALENDAR
-   ============================================= */
 
 .calendar-cell {
   background: var(--glass-bg-card);
@@ -644,10 +583,6 @@ body {
   border-color: var(--accent-purple);
   background: rgba(180, 141, 245, 0.08);
 }
-
-/* =============================================
-   SIDEBAR ACTIVE STATE
-   ============================================= */
 
 .sidebar-item {
   display: flex;
@@ -705,10 +640,6 @@ body {
   border-radius: 0 3px 3px 0;
 }
 
-/* =============================================
-   TOGGLE SWITCH (theme/language)
-   ============================================= */
-
 .toggle-switch {
   display: flex;
   align-items: center;
@@ -735,10 +666,6 @@ body {
   border: 1px solid var(--glass-border-strong);
 }
 
-/* =============================================
-   NOTE CARD
-   ============================================= */
-
 .note-card {
   background: var(--glass-bg-card);
   border: 1px solid var(--glass-border);
@@ -757,10 +684,6 @@ body {
   box-shadow: var(--glass-shadow);
 }
 
-/* =============================================
-   ANALYTICS CHART BARS
-   ============================================= */
-
 .chart-bar {
   background: linear-gradient(180deg, var(--accent-blue) 0%, rgba(88,166,255,0.3) 100%);
   border-radius: 6px 6px 0 0;
@@ -770,10 +693,6 @@ body {
 :root.light .chart-bar {
   background: linear-gradient(180deg, var(--accent-blue) 0%, rgba(37,99,235,0.3) 100%);
 }
-
-/* =============================================
-   DASHBOARD TILE HOVER
-   ============================================= */
 
 .dashboard-tile:hover {
   transform: translateY(-3px);
@@ -785,18 +704,10 @@ body {
   transform: translateY(-1px);
 }
 
-/* =============================================
-   SPINNER (used in loading states)
-   ============================================= */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* =============================================
-   APP LAYOUT — CSS-DRIVEN (no window.innerWidth)
-   ============================================= */
-
-/* Loading screen */
 .app-loading {
   min-height: 100vh;
   display: flex;
@@ -814,7 +725,6 @@ body {
   animation: spin 0.9s linear infinite;
 }
 
-/* Root wrapper */
 .app-root {
   min-height: 100vh;
   background: var(--gradient-bg);
@@ -822,7 +732,6 @@ body {
   position: relative;
 }
 
-/* ── Sidebar ── */
 .app-sidebar {
   position: fixed;
   top: 0;
@@ -837,25 +746,21 @@ body {
   backdrop-filter: blur(24px) saturate(2);
   -webkit-backdrop-filter: blur(24px) saturate(2);
   border-right: 1px solid var(--glass-border);
-  /* Mobile: hidden by default */
   transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
 }
 
-/* Desktop: always visible */
 @media (min-width: 1024px) {
   .app-sidebar {
     transform: translateX(0) !important;
   }
 }
 
-/* Mobile open state */
 .app-sidebar.is-open {
   transform: translateX(0);
 }
 
-/* Sidebar overlay (mobile) */
 .sidebar-overlay {
   position: fixed;
   inset: 0;
@@ -871,7 +776,6 @@ body {
   }
 }
 
-/* Sidebar internals */
 .sidebar-logo {
   display: flex;
   align-items: center;
@@ -934,13 +838,11 @@ body {
   color: var(--accent-purple);
 }
 
-/* ── Main column ── */
 .app-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  /* On desktop shift right of sidebar */
   margin-left: 0;
 }
 
@@ -950,11 +852,9 @@ body {
   }
 }
 
-/* ── Header ── */
 .app-header {
   position: fixed;
   top: 0;
-  /* Mobile: full width */
   left: 0;
   right: 0;
   height: var(--header-height);
@@ -962,7 +862,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* Mobile padding: no sidebar offset */
   padding: 0 16px;
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(1.8);
@@ -970,7 +869,6 @@ body {
   border-bottom: 1px solid var(--glass-border);
 }
 
-/* Desktop: shift header to account for sidebar */
 @media (min-width: 1024px) {
   .app-header {
     left: var(--sidebar-width);
@@ -986,7 +884,6 @@ body {
 }
 
 .header-menu-btn {
-  /* Show only on mobile */
   display: flex;
 }
 
@@ -1019,7 +916,6 @@ body {
   flex-shrink: 0;
 }
 
-/* Hide "Задача" label text on small mobile to save space */
 .header-add-label {
   display: none;
 }
@@ -1030,13 +926,10 @@ body {
   }
 }
 
-/* ── Main content area ── */
 .app-content {
   flex: 1;
   padding: 16px;
-  /* Top padding = header height + gap */
   padding-top: calc(var(--header-height) + 12px);
-  /* Bottom padding = bottom nav height + gap (mobile) */
   padding-bottom: calc(var(--bottom-nav-height, 0px) + 16px);
   max-width: 100%;
   overflow-x: hidden;
@@ -1050,7 +943,6 @@ body {
   }
 }
 
-/* ── Bottom Nav (mobile only) ── */
 :root {
   --bottom-nav-height: 72px;
 }
@@ -1072,7 +964,6 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Hide on desktop */
 @media (min-width: 1024px) {
   .bottom-nav {
     display: none;
@@ -1117,7 +1008,6 @@ body {
   white-space: nowrap;
 }
 
-/* FAB (centre button) */
 .bottom-nav-fab-wrap {
   flex: 1;
   display: flex;
@@ -1146,11 +1036,6 @@ body {
   box-shadow: 0 2px 10px rgba(94, 196, 184, 0.25);
 }
 
-/* =============================================
-   RESPONSIVE DASHBOARD
-   ============================================= */
-
-/* 4-tile grid: 2 cols on mobile, 4 cols on desktop */
 .dashboard-tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1164,7 +1049,6 @@ body {
   }
 }
 
-/* Chart row: stack on mobile, side-by-side on tablet+ */
 .dashboard-charts {
   display: grid;
   grid-template-columns: 1fr;
@@ -1178,20 +1062,11 @@ body {
   }
 }
 
-/* =============================================
-   RESPONSIVE TASK LIST
-   ============================================= */
-
-/* On mobile, hide sort dropdown label */
 @media (max-width: 480px) {
   .task-sort-label {
     display: none;
   }
 }
-
-/* =============================================
-   MODAL — full screen on mobile
-   ============================================= */
 
 @media (max-width: 540px) {
   .modal-overlay {
@@ -1207,10 +1082,6 @@ body {
   }
 }
 
-/* =============================================
-   CALENDAR responsive
-   ============================================= */
-
 @media (max-width: 640px) {
   .calendar-cell {
     min-height: 52px;
@@ -1218,25 +1089,16 @@ body {
     border-radius: 8px;
   }
 
-  /* Hide day detail panel inline on mobile — it shows below */
   .calendar-detail-panel {
     margin-top: 12px;
   }
 }
-
-/* =============================================
-   NOTES GRID responsive
-   ============================================= */
 
 @media (max-width: 480px) {
   .notes-grid {
     grid-template-columns: 1fr !important;
   }
 }
-
-/* =============================================
-   TASK FORM — RESPONSIVE
-   ============================================= */
 
 .form-header {
   display: flex;
@@ -1289,7 +1151,6 @@ body {
   letter-spacing: 0.06em;
 }
 
-/* 2-column grid that stacks on small mobile */
 .form-row-2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1302,14 +1163,12 @@ body {
   }
 }
 
-/* Date needs the wide column. Hours only sits beside it on a wide modal. */
 .form-row-date {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
-/* 3-column for categories (stays 3 — text is short enough) */
 .form-row-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1330,7 +1189,6 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Native select styled to match glass inputs */
 .glass-select {
   background: var(--glass-bg-card);
   border: 1px solid var(--glass-border);
@@ -1361,7 +1219,6 @@ body {
   color: var(--text-primary);
 }
 
-/* Modal bottom-sheet on mobile */
 @media (max-width: 540px) {
   .modal-overlay {
     align-items: flex-end;
@@ -1387,11 +1244,6 @@ body {
   }
 }
 
-/* =============================================
-   CALENDAR — RESPONSIVE
-   ============================================= */
-
-/* On desktop: grid with side panel; on mobile: stacked */
 .calendar-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -1405,7 +1257,6 @@ body {
   }
 }
 
-/* On mobile, day detail panel appears below the grid */
 .calendar-day-panel {
   width: 100%;
 }
@@ -1417,11 +1268,6 @@ body {
   }
 }
 
-/* =============================================
-   FORM DATE/NUMBER INPUT FIXES FOR MOBILE
-   ============================================= */
-
-/* Date and number inputs fill their cell and cannot blow out the row */
 input[type="date"],
 input[type="number"] {
   display: block;
@@ -1446,7 +1292,6 @@ input[type="date"]::-webkit-date-and-time-value {
   padding: 0;
 }
 
-/* Modal must never be wider than viewport */
 .modal-overlay {
   overflow: hidden;
 }
@@ -1456,7 +1301,6 @@ input[type="date"]::-webkit-date-and-time-value {
   max-width: min(540px, 100vw);
 }
 
-/* Prevent any child from causing horizontal scroll inside modal */
 .form-body * {
   box-sizing: border-box;
   max-width: 100%;

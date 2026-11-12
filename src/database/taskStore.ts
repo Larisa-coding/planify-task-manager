@@ -124,7 +124,6 @@ const persist = () => {
   try {
     localStorage.setItem(KEY, JSON.stringify(tasks.map(serialize)));
   } catch {
-    /* quota / private mode — keep the in-memory list for this session */
   }
   listeners.forEach((listener) => listener());
 };
@@ -251,7 +250,6 @@ const mergeIn = (incoming: Task[]) => {
 
 let hydratePromise: Promise<void> | null = null;
 
-/** Pull tasks saved by older builds (IndexedDB / legacy backup) once. Never replaces newer localStorage data with an empty read. */
 export const hydrateFromIndexedDB = (): Promise<void> => {
   if (hydratePromise) return hydratePromise;
   hydratePromise = (async () => {

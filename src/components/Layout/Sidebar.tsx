@@ -37,7 +37,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className={`app-sidebar ${isOpen ? 'is-open' : ''}`}>
-      {/* Logo */}
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon" aria-hidden="true">
           <ListTodo size={16} />
@@ -48,7 +47,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="sidebar-nav">
         <button
           type="button"

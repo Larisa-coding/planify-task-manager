@@ -26,7 +26,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
   const month = currentDate.getMonth();
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  const startDow = (firstDay.getDay() + 6) % 7; // Mon=0
+  const startDow = (firstDay.getDay() + 6) % 7;
   const daysInMonth = lastDay.getDate();
   const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7;
 
@@ -66,10 +66,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
   return (
     <div style={{ maxWidth: 900, width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Nav header */}
       <div className="glass-card" style={{ padding: '14px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-          {/* Prev/Month/Next */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <button className="btn btn-ghost btn-icon" onClick={prevMonth} aria-label="Previous month">
               <ChevronLeft size={18} />
@@ -93,11 +91,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
         </div>
       </div>
 
-      {/* Calendar grid + optional day panel */}
       <div className={`calendar-layout ${selectedDate ? 'has-panel' : ''}`}>
-        {/* Grid */}
         <div>
-          {/* Week day headers */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginBottom: 3 }}>
             {weekDays.map(d => (
               <div key={d} style={{
@@ -110,7 +105,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
             ))}
           </div>
 
-          {/* Cells */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
             {Array.from({ length: totalCells }).map((_, i) => {
               const dayNum = i - startDow + 1;
@@ -173,7 +167,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
           </div>
         </div>
 
-        {/* Selected day panel */}
         {selectedDate && (
           <div className="glass-card calendar-day-panel" style={{ padding: '16px' }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>

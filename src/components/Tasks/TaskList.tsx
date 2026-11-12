@@ -146,9 +146,7 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
 
   return (
     <div style={{ maxWidth: 800, width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Toolbar */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        {/* Search */}
         <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
           <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
           <input
@@ -173,7 +171,6 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
         </button>
       </div>
 
-      {/* Filter bar */}
       {showFilters && (
         <div className="glass-card" style={{ padding: '14px 16px', display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -211,7 +208,6 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
         </div>
       )}
 
-      {/* Count */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
           {filtered.length} {language === 'ru' ? 'задач' : 'tasks'}
@@ -224,7 +220,6 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
         )}
       </div>
 
-      {/* Task list */}
       {filtered.length === 0 ? (
         <div className="glass-card" style={{ padding: 40, textAlign: 'center' }}>
           <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
@@ -259,7 +254,6 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
                 style={{ borderLeftColor: task.color || color, borderLeftWidth: 3 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {/* Complete toggle */}
                   <button
                     onClick={() => updateTaskStatus(task.id, isCompleted ? 'new' : 'completed')}
                     style={{
@@ -274,7 +268,6 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
                     {isCompleted && <Check size={12} color="#fff" />}
                   </button>
 
-                  {/* Title + meta */}
                   <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => onEditTask(task)}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       {getPriorityDot(task.priority)}
@@ -311,7 +304,6 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
                     {task.description ? (
                       <button
@@ -334,7 +326,6 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
                   </div>
                 </div>
 
-                {/* Expanded details */}
                 {isExpanded && (
                   <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--glass-border)' }}>
                     {task.description && (

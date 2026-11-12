@@ -34,7 +34,6 @@ export default function AnalyticsView() {
   const stats = useMemo(() => {
     const now = new Date();
 
-    // Filter by period
     const periodStart =
       period === 'week'  ? startOfWeek(now, { weekStartsOn: 1 }) :
       period === 'month' ? startOfMonth(now) : new Date(0);
@@ -50,7 +49,6 @@ export default function AnalyticsView() {
     const completionRate = total > 0 ? Math.round((completed.length / total) * 100) : 0;
     const overdueRate    = activeTasks.length > 0 ? Math.round((overdue.length / activeTasks.length) * 100) : 0;
 
-    // Avg completion time (hours)
     const timesToComplete = completed
       .filter(t => t.completedAt)
       .map(t => differenceInHours(t.completedAt!, t.createdAt));
@@ -58,7 +56,6 @@ export default function AnalyticsView() {
       ? Math.round(timesToComplete.reduce((a, b) => a + b, 0) / timesToComplete.length)
       : 0;
 
-    // By category (of all active + completed)
     const byCategory = (['personal', 'work', 'wishes'] as TaskCategory[]).map(cat => ({
       cat,
       total: activeTasks.filter(t => t.category === cat).length,
@@ -67,14 +64,12 @@ export default function AnalyticsView() {
 
     const maxCatTotal = Math.max(...byCategory.map(c => c.total), 1);
 
-    // By priority
     const byPriority = (['urgent', 'high', 'medium', 'low'] as Priority[]).map(p => ({
       p,
       count: activeTasks.filter(t => t.priority === p).length,
     }));
     const maxPriCount = Math.max(...byPriority.map(c => c.count), 1);
 
-    // Productivity score (0-100): weighted formula
     const score = Math.min(100, Math.round(
       completionRate * 0.5 +
       Math.max(0, 100 - overdueRate) * 0.3 +
@@ -135,7 +130,6 @@ export default function AnalyticsView() {
 
   return (
     <div style={{ maxWidth: 800, display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Header + period selector */}
       <div className="glass-card" style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{t.analytics.title}</h2>
@@ -159,7 +153,6 @@ export default function AnalyticsView() {
         </div>
       </div>
 
-      {/* Productivity score */}
       <div className="glass-card" style={{ padding: '20px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
@@ -188,7 +181,6 @@ export default function AnalyticsView() {
         </div>
       </div>
 
-      {/* Top stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
         {topCards.map(card => (
           <div key={card.label} className="stat-card">
@@ -204,7 +196,6 @@ export default function AnalyticsView() {
         ))}
       </div>
 
-      {/* By category */}
       <div className="glass-card" style={{ padding: '20px 24px' }}>
         <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 }}>{t.analytics.tasks_by_category}</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -233,7 +224,6 @@ export default function AnalyticsView() {
         </div>
       </div>
 
-      {/* By priority */}
       <div className="glass-card" style={{ padding: '20px 24px' }}>
         <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 }}>{t.analytics.tasks_by_priority}</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -256,7 +246,6 @@ export default function AnalyticsView() {
         </div>
       </div>
 
-      {/* Active tasks count */}
       <div className="glass-card" style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{t.analytics.active_tasks}</div>

@@ -2,7 +2,6 @@ export type Language = 'ru' | 'en';
 
 export const translations = {
   ru: {
-    // Navigation
     nav: {
       dashboard: 'Главная',
       tasks: 'Задачи',
@@ -10,11 +9,9 @@ export const translations = {
       work: 'Рабочее',
       wishes: 'Желания',
       calendar: 'Календарь',
-      notes: 'Заметки',
       archive: 'Архив',
       analytics: 'Аналитика',
     },
-    // Dashboard
     dashboard: {
       greeting_morning: 'Доброе утро',
       greeting_afternoon: 'Добрый день',
@@ -32,7 +29,6 @@ export const translations = {
       no_tasks: 'Задач пока нет',
       quick_add: 'Быстро добавить',
     },
-    // Tasks
     tasks: {
       title: 'Задачи',
       add_task: 'Новая задача',
@@ -47,8 +43,6 @@ export const translations = {
       due_date: 'Срок выполнения',
       tags: 'Теги',
       tags_placeholder: 'Добавить тег...',
-      checklist: 'Чек-лист',
-      checklist_placeholder: 'Новый пункт...',
       estimated_hours: 'Оценка (часы)',
       save: 'Сохранить',
       cancel: 'Отмена',
@@ -69,27 +63,23 @@ export const translations = {
       deleted: 'Удалено',
       categories_label: 'Категории',
     },
-    // Categories
     categories: {
       personal: 'Личное',
       work: 'Рабочее',
       wishes: 'Желания',
     },
-    // Priorities
     priorities: {
       low: 'Низкий',
       medium: 'Средний',
       high: 'Высокий',
       urgent: 'Срочно',
     },
-    // Statuses
     statuses: {
       new: 'Новая',
       in_progress: 'В работе',
       completed: 'Выполнена',
       cancelled: 'Отменена',
     },
-    // Calendar
     calendar: {
       title: 'Календарь',
       subtitle: 'Задачи с дедлайнами',
@@ -102,34 +92,12 @@ export const translations = {
         'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
       ],
     },
-    // Notes
-    notes: {
-      title: 'Заметки',
-      add_note: 'Новая заметка',
-      edit_note: 'Редактировать заметку',
-      note_title: 'Заголовок',
-      note_title_placeholder: 'Название заметки...',
-      content: 'Содержимое',
-      content_placeholder: 'Начните писать...',
-      color: 'Цвет',
-      tags: 'Теги',
-      save: 'Сохранить',
-      cancel: 'Отмена',
-      delete: 'Удалить',
-      no_notes: 'Заметок нет',
-      no_notes_subtitle: 'Создайте первую заметку',
-      search: 'Поиск заметок...',
-    },
-    // Archive
     archive: {
       title: 'Архив',
       subtitle: 'Выполненные и удалённые задачи',
       tasks_tab: 'Задачи',
-      notes_tab: 'Заметки',
       completed_tasks: 'Выполненные задачи',
       deleted_tasks: 'Удалённые задачи',
-      deleted_notes: 'Удалённые заметки',
-      archived_notes: 'Архив заметок',
       restore: 'Восстановить',
       delete_permanently: 'Удалить навсегда',
       no_archived: 'Архив пуст',
@@ -143,7 +111,6 @@ export const translations = {
       filter_completed: 'Выполненные',
       filter_deleted: 'Удалённые',
     },
-    // Analytics
     analytics: {
       title: 'Аналитика',
       subtitle: 'Ваша продуктивность',
@@ -163,7 +130,6 @@ export const translations = {
       streak_days: 'дней подряд',
       no_data: 'Недостаточно данных',
     },
-    // Common
     common: {
       loading: 'Загрузка...',
       error: 'Ошибка',
@@ -193,7 +159,6 @@ export const translations = {
       work: 'Work',
       wishes: 'Wishes',
       calendar: 'Calendar',
-      notes: 'Notes',
       archive: 'Archive',
       analytics: 'Analytics',
     },
@@ -228,8 +193,6 @@ export const translations = {
       due_date: 'Due date',
       tags: 'Tags',
       tags_placeholder: 'Add a tag...',
-      checklist: 'Checklist',
-      checklist_placeholder: 'New item...',
       estimated_hours: 'Estimate (hours)',
       save: 'Save',
       cancel: 'Cancel',
@@ -279,32 +242,12 @@ export const translations = {
         'July', 'August', 'September', 'October', 'November', 'December',
       ],
     },
-    notes: {
-      title: 'Notes',
-      add_note: 'New note',
-      edit_note: 'Edit note',
-      note_title: 'Title',
-      note_title_placeholder: 'Note title...',
-      content: 'Content',
-      content_placeholder: 'Start writing...',
-      color: 'Color',
-      tags: 'Tags',
-      save: 'Save',
-      cancel: 'Cancel',
-      delete: 'Delete',
-      no_notes: 'No notes',
-      no_notes_subtitle: 'Create your first note',
-      search: 'Search notes...',
-    },
     archive: {
       title: 'Archive',
       subtitle: 'Completed and deleted tasks',
       tasks_tab: 'Tasks',
-      notes_tab: 'Notes',
       completed_tasks: 'Completed tasks',
       deleted_tasks: 'Deleted tasks',
-      deleted_notes: 'Deleted notes',
-      archived_notes: 'Archived notes',
       restore: 'Restore',
       delete_permanently: 'Delete permanently',
       no_archived: 'Archive is empty',

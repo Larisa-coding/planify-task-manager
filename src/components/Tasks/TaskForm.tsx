@@ -106,7 +106,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
     <div className="modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
       <form className="modal-content" onSubmit={handleSave}>
 
-        {/* Header */}
         <div className="form-header">
           <h2 className="form-title">{task ? t.tasks.edit_task : t.tasks.add_task}</h2>
           <button type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close">
@@ -114,10 +113,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
           </button>
         </div>
 
-        {/* Body */}
         <div className="form-body">
 
-          {/* Title */}
           <div className="form-field">
             <label className="form-label">{t.tasks.task_title}</label>
             <input
@@ -129,7 +126,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             />
           </div>
 
-          {/* Description */}
           <div className="form-field">
             <label className="form-label">{t.tasks.description}</label>
             <textarea
@@ -142,7 +138,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             />
           </div>
 
-          {/* Category */}
           <div className="form-field">
             <label className="form-label">{t.tasks.category}</label>
             <div className="form-row-3">
@@ -164,7 +159,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             </div>
           </div>
 
-          {/* Status + Priority */}
           <div className="form-row-2">
             <div className="form-field">
               <label className="form-label">{t.tasks.status}</label>
@@ -180,7 +174,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             </div>
           </div>
 
-          {/* Due date and hours are full width so the date field matches the other inputs */}
           <div className="form-row-date">
             <div className="form-field">
               <label className="form-label" htmlFor="task-due-date">{t.tasks.due_date}</label>
@@ -207,7 +200,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             </div>
           </div>
 
-          {/* Tags */}
           <div className="form-field">
             <label className="form-label">{t.tasks.tags}</label>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -242,7 +234,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             )}
           </div>
 
-          {/* Color */}
           <div className="form-field">
             <label className="form-label">{language === 'ru' ? 'Цвет метки' : 'Label color'}</label>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -276,7 +267,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
 
         </div>
 
-        {/* Footer */}
         <div className="form-footer">
           <button type="button" className="btn btn-ghost" onClick={onClose}>{t.tasks.cancel}</button>
           <button

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { Language, translations } from '../i18n/translations';
 
-// Use a loose type for t to avoid deep readonly literal incompatibility
 type AnyTranslation = typeof translations.ru;
 
 interface LanguageContextType {

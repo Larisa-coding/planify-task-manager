@@ -18,7 +18,6 @@ export const Header: React.FC<HeaderProps> = ({
   const { toggleTheme, isDark } = useTheme();
   const { language, setLanguage, t } = useLanguage();
 
-  // Build page title
   const baseTitles: Record<Page, string> = {
     dashboard: t.nav.dashboard,
     tasks:     t.nav.tasks,
