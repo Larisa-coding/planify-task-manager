@@ -1,48 +1,26 @@
-const CACHE_NAME = 'task-manager-pro-v1';
-const urlsToCache = [
-  '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+const CACHE_NAME = 'planify-v4';
 
-// Установка Service Worker
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  self.skipWaiting();
+  event.waitUntil(Promise.resolve());
 });
 
-// Активация Service Worker
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((key) => caches.delete(key)));
+    await self.clients.claim();
+    const windowClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    await Promise.all(windowClients.map((client) => {
+      if (!client.url || typeof client.navigate !== 'function') return Promise.resolve();
+      return client.navigate(client.url).catch(() => undefined);
+    }));
+  })());
 });
 
-// Перехват запросов
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Возвращаем кэшированную версию или загружаем из сети
-        return response || fetch(event.request);
-      }
-    )
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Check } from 'lucide-react';
-import { useTasks } from '../../hooks/useTasks';
+import { X, Plus } from 'lucide-react';
+import { createTask, updateTask } from '../../database/taskStore';
 import { useLanguage } from '../../context/LanguageContext';
-import { Task, TaskCategory, TaskStatus, Priority, ChecklistItem } from '../../types';
-import { v4 as uuidv4 } from 'uuid';
+import { Task, TaskCategory, TaskStatus, Priority } from '../../types';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -15,7 +14,6 @@ interface TaskFormProps {
 const COLORS = ['#b48df5', '#5ec4b8', '#f589b0', '#5cb87a', '#e0a060', '#e06060', '#7ab3f0', '#ffa657'];
 
 export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defaultCategory = 'personal' }) => {
-  const { createTask, updateTask } = useTasks();
   const { t, language } = useLanguage();
 
   const [title, setTitle] = useState('');
@@ -27,10 +25,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [color, setColor] = useState('');
-  const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
-  const [checkInput, setCheckInput] = useState('');
   const [estimatedHours, setEstimatedHours] = useState('');
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -43,54 +38,46 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
       setDueDate(task.dueDate ? task.dueDate.toISOString().slice(0, 10) : '');
       setTags(task.tags || []);
       setColor(task.color || '');
-      setChecklist(task.checklist || []);
       setEstimatedHours(task.estimatedHours?.toString() || '');
     } else {
-      setTitle(''); setDescription(''); setCategory(defaultCategory);
-      setStatus('new'); setPriority('medium'); setDueDate('');
-      setTags([]); setColor(''); setChecklist([]); setEstimatedHours('');
+      setTitle('');
+      setDescription('');
+      setCategory(defaultCategory);
+      setStatus('new');
+      setPriority('medium');
+      setDueDate('');
+      setTags([]);
+      setColor('');
+      setEstimatedHours('');
     }
-    setTagInput(''); setCheckInput('');
+    setTagInput('');
   }, [isOpen, task, defaultCategory]);
 
-  const handleSave = async () => {
-    if (!title.trim()) return;
-    setSaving(true);
-    try {
-      const payload = {
-        title: title.trim(),
-        description: description.trim() || undefined,
-        category,
-        status,
-        priority,
-        dueDate: dueDate ? new Date(dueDate) : undefined,
-        tags,
-        color: color || undefined,
-        checklist,
-        estimatedHours: estimatedHours ? Number(estimatedHours) : undefined,
-        completedAt: status === 'completed' && !task?.completedAt ? new Date() : task?.completedAt,
-      };
-      if (task) {
-        await updateTask(task.id, payload);
-      } else {
-        await createTask(payload as any);
-      }
-      onClose();
-    } finally {
-      setSaving(false);
-    }
+  const handleSave = (event?: React.FormEvent) => {
+    event?.preventDefault();
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    const payload = {
+      title: trimmed,
+      description: description.trim() || undefined,
+      category,
+      status,
+      priority,
+      dueDate: dueDate ? new Date(`${dueDate}T12:00:00`) : undefined,
+      tags,
+      color: color || undefined,
+      estimatedHours: estimatedHours ? Number(estimatedHours) : undefined,
+      completedAt: status === 'completed' ? (task?.completedAt ?? new Date()) : undefined,
+    };
+    if (task) updateTask(task.id, payload);
+    else createTask(payload);
+    onClose();
   };
 
   const addTag = () => {
     const v = tagInput.trim();
     if (v && !tags.includes(v)) setTags([...tags, v]);
     setTagInput('');
-  };
-
-  const addCheckItem = () => {
-    const v = checkInput.trim();
-    if (v) setChecklist([...checklist, { id: uuidv4(), text: v, completed: false, createdAt: new Date() }]);
-    setCheckInput('');
   };
 
   if (!isOpen) return null;
@@ -116,18 +103,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
   ];
 
   return (
-    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content">
+    <div className="modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <form className="modal-content" onSubmit={handleSave}>
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="form-header">
           <h2 className="form-title">{task ? t.tasks.edit_task : t.tasks.add_task}</h2>
-          <button className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close">
+          <button type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close">
             <X size={18} />
           </button>
         </div>
 
-        {/* ── Body ── */}
+        {/* Body */}
         <div className="form-body">
 
           {/* Title */}
@@ -139,7 +126,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
               value={title}
               onChange={e => setTitle(e.target.value)}
               autoFocus
-              onKeyDown={e => e.key === 'Enter' && handleSave()}
             />
           </div>
 
@@ -162,6 +148,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             <div className="form-row-3">
               {categories.map(c => (
                 <button
+                  type="button"
                   key={c.value}
                   onClick={() => setCategory(c.value)}
                   className="category-btn"
@@ -177,31 +164,23 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             </div>
           </div>
 
-          {/* Status + Priority — stack on mobile */}
+          {/* Status + Priority */}
           <div className="form-row-2">
             <div className="form-field">
               <label className="form-label">{t.tasks.status}</label>
-              <select
-                value={status}
-                onChange={e => setStatus(e.target.value as TaskStatus)}
-                className="glass-select"
-              >
+              <select value={status} onChange={e => setStatus(e.target.value as TaskStatus)} className="glass-select">
                 {statuses.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
             <div className="form-field">
               <label className="form-label">{t.tasks.priority}</label>
-              <select
-                value={priority}
-                onChange={e => setPriority(e.target.value as Priority)}
-                className="glass-select"
-              >
+              <select value={priority} onChange={e => setPriority(e.target.value as Priority)} className="glass-select">
                 {priorities.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
               </select>
             </div>
           </div>
 
-          {/* Due date + Hours — stack on mobile */}
+          {/* Due date + Hours */}
           <div className="form-row-2">
             <div className="form-field">
               <label className="form-label">{t.tasks.due_date}</label>
@@ -238,7 +217,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); }}}
                 style={{ flex: 1 }}
               />
-              <button className="btn btn-ghost btn-icon" onClick={addTag} type="button">
+              <button className="btn btn-ghost btn-icon" onClick={addTag} type="button" aria-label={t.tasks.tags}>
                 <Plus size={16} />
               </button>
             </div>
@@ -266,6 +245,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             <label className="form-label">{language === 'ru' ? 'Цвет метки' : 'Label color'}</label>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <button
+                type="button"
+                aria-label={language === 'ru' ? 'Без цвета' : 'No color'}
                 onClick={() => setColor('')}
                 style={{
                   width: 26, height: 26, borderRadius: '50%', cursor: 'pointer', flexShrink: 0,
@@ -275,7 +256,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
               />
               {COLORS.map(c => (
                 <button
+                  type="button"
                   key={c}
+                  aria-label={c}
                   onClick={() => setColor(c)}
                   style={{
                     width: 26, height: 26, borderRadius: '50%', cursor: 'pointer', flexShrink: 0,
@@ -289,74 +272,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             </div>
           </div>
 
-          {/* Checklist */}
-          <div className="form-field">
-            <label className="form-label">{t.tasks.checklist}</label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input
-                className="glass-input"
-                placeholder={t.tasks.checklist_placeholder}
-                value={checkInput}
-                onChange={e => setCheckInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCheckItem(); }}}
-                style={{ flex: 1 }}
-              />
-              <button className="btn btn-ghost btn-icon" onClick={addCheckItem} type="button">
-                <Plus size={16} />
-              </button>
-            </div>
-            {checklist.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
-                {checklist.map(item => (
-                  <div key={item.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
-                    background: 'var(--glass-bg-card)', borderRadius: 8, border: '1px solid var(--glass-border)',
-                  }}>
-                    <button
-                      onClick={() => setChecklist(checklist.map(c => c.id === item.id ? { ...c, completed: !c.completed } : c))}
-                      style={{
-                        width: 18, height: 18, borderRadius: 5, flexShrink: 0,
-                        border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--glass-border-strong)'}`,
-                        background: item.completed ? 'var(--accent-green)' : 'transparent',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                      }}
-                    >
-                      {item.completed && <Check size={11} color="#fff" />}
-                    </button>
-                    <span style={{
-                      flex: 1, fontSize: 13,
-                      color: item.completed ? 'var(--text-muted)' : 'var(--text-secondary)',
-                      textDecoration: item.completed ? 'line-through' : 'none',
-                    }}>
-                      {item.text}
-                    </span>
-                    <button
-                      onClick={() => setChecklist(checklist.filter(c => c.id !== item.id))}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--accent-red)' }}
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
         </div>
 
-        {/* ── Footer ── */}
+        {/* Footer */}
         <div className="form-footer">
-          <button className="btn btn-ghost" onClick={onClose}>{t.tasks.cancel}</button>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>{t.tasks.cancel}</button>
           <button
+            type="submit"
             className="btn btn-primary"
-            onClick={handleSave}
-            disabled={!title.trim() || saving}
+            disabled={!title.trim()}
           >
-            {saving ? '...' : t.tasks.save}
+            {t.tasks.save}
           </button>
         </div>
 
-      </div>
+      </form>
     </div>
   );
 };

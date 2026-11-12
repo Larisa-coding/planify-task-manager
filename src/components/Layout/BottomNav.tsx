@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, CheckSquare, Calendar, BarChart2, Plus } from 'lucide-react';
+import { LayoutDashboard, ListTodo, Calendar, Archive, Plus } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { Page } from '../../App';
 import { TaskCategory } from '../../types';
@@ -19,10 +19,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentPage, onNavigate, o
 
   const items: NavEntry[] = [
     { type: 'page', id: 'dashboard', label: t.nav.dashboard, icon: <LayoutDashboard size={22} /> },
-    { type: 'page', id: 'tasks',     label: t.nav.tasks,     icon: <CheckSquare size={22} /> },
+    { type: 'page', id: 'tasks',     label: t.nav.tasks,     icon: <ListTodo size={22} /> },
     { type: 'fab' },
     { type: 'page', id: 'calendar',  label: t.nav.calendar,  icon: <Calendar size={22} /> },
-    { type: 'page', id: 'analytics', label: t.nav.analytics, icon: <BarChart2 size={22} /> },
+    { type: 'page', id: 'archive',   label: t.nav.archive,   icon: <Archive size={22} /> },
   ];
 
   return (

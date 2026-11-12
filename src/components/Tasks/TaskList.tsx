@@ -6,7 +6,8 @@ import {
 } from 'lucide-react';
 import { useTasks } from '../../hooks/useTasks';
 import { useLanguage } from '../../context/LanguageContext';
-import { Task, TaskCategory, Priority, TaskStatus } from '../../types';import { format, isBefore, isToday, isTomorrow } from 'date-fns';
+import { Task, TaskCategory, Priority, TaskStatus } from '../../types';
+import { format, isBefore, isToday, isTomorrow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 interface TaskListProps {
@@ -48,7 +49,7 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
       list = list.filter(t =>
         t.title.toLowerCase().includes(q) ||
         t.description?.toLowerCase().includes(q) ||
-        t.tags.some(tag => tag.toLowerCase().includes(q))
+        (t.tags ?? []).some(tag => tag.toLowerCase().includes(q))
       );
     }
     if (filterStatus !== 'all') {
@@ -73,6 +74,13 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
 
     return list;
   }, [tasks, search, filterStatus, sortKey]);
+
+  const sections = useMemo(() => {
+    if (category) return [{ key: category, items: filtered }];
+    return (['personal', 'work', 'wishes'] as TaskCategory[])
+      .map(key => ({ key, items: filtered.filter(task => task.category === key) }))
+      .filter(section => section.items.length > 0);
+  }, [filtered, category]);
 
   const toggleExpand = (id: string) => {
     setExpanded(prev => {
@@ -229,14 +237,20 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
           )}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {filtered.map(task => {
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {sections.map(section => (
+          <div key={section.key} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {!category && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: categoryColors[section.key], textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                {categoryIcons[section.key]}
+                {t.categories[section.key]}
+                <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{section.items.length}</span>
+              </div>
+            )}
+          {section.items.map(task => {
             const isExpanded = expanded.has(task.id);
             const isCompleted = task.status === 'completed';
             const color = category ? categoryColors[category] : categoryColors[task.category];
-
-            const checklistDone = task.checklist?.filter(c => c.completed).length || 0;
-            const checklistTotal = task.checklist?.length || 0;
 
             return (
               <div
@@ -284,17 +298,12 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
                         </span>
                       )}
                       {getDueBadge(task)}
-                      {checklistTotal > 0 && (
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <Check size={11} />{checklistDone}/{checklistTotal}
-                        </span>
-                      )}
-                      {task.estimatedHours && (
+                      {!!task.estimatedHours && (
                         <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 3 }}>
                           <Clock size={11} />{task.estimatedHours}h
                         </span>
                       )}
-                      {task.tags.map(tag => (
+                      {(task.tags ?? []).map(tag => (
                         <span key={tag} style={{ fontSize: 11, color: 'var(--text-muted)', background: 'var(--glass-bg-card)', borderRadius: 20, padding: '1px 7px', border: '1px solid var(--glass-border)' }}>
                           {tag}
                         </span>
@@ -304,7 +313,7 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
 
                   {/* Actions */}
                   <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                    {task.description || (task.checklist?.length || 0) > 0 ? (
+                    {task.description ? (
                       <button
                         className="btn btn-ghost btn-icon"
                         onClick={() => toggleExpand(task.id)}
@@ -329,43 +338,17 @@ export const TaskList: React.FC<TaskListProps> = ({ category, onAddTask, onEditT
                 {isExpanded && (
                   <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--glass-border)' }}>
                     {task.description && (
-                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: task.checklist?.length ? 10 : 0, lineHeight: 1.6 }}>
+                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 0, lineHeight: 1.6 }}>
                         {task.description}
                       </p>
                     )}
-                    {task.checklist && task.checklist.length > 0 && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {task.checklist.map(item => (
-                          <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{
-                              width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-                              border: `1.5px solid ${item.completed ? 'var(--accent-green)' : 'var(--glass-border-strong)'}`,
-                              background: item.completed ? 'var(--accent-green)' : 'transparent',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                              {item.completed && <Check size={10} color="#fff" />}
-                            </div>
-                            <span style={{ fontSize: 13, color: item.completed ? 'var(--text-muted)' : 'var(--text-secondary)', textDecoration: item.completed ? 'line-through' : 'none' }}>
-                              {item.text}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Progress bar for checklist */}
-                {checklistTotal > 0 && (
-                  <div style={{ marginTop: 8 }}>
-                    <div className="progress-bar" style={{ height: 3 }}>
-                      <div className="progress-fill" style={{ width: `${(checklistDone / checklistTotal) * 100}%` }} />
-                    </div>
                   </div>
                 )}
               </div>
             );
           })}
+          </div>
+          ))}
         </div>
       )}
     </div>

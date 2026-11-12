@@ -24,17 +24,15 @@ export default function ArchiveView({ onEditTask }: ArchiveViewProps) {
   const [filter, setFilter] = useState<Filter>('all');
 
   const archived = useMemo(() => {
+    const stamp = (task: Task) => {
+      const date = task.deletedAt || task.completedAt || task.updatedAt;
+      return date instanceof Date && !Number.isNaN(date.getTime()) ? date.getTime() : 0;
+    };
     return tasks.filter(task => {
-      if (task.status === 'new' || task.status === 'in_progress') return false;
-      if (task.isDeleted) return filter === 'all' || filter === 'deleted';
-      if (task.status === 'completed') return filter === 'all' || filter === 'completed';
-      if (task.status === 'cancelled') return filter === 'all' || filter === 'deleted';
-      return false;
-    }).sort((a, b) => {
-      const da = a.deletedAt || a.completedAt || a.updatedAt;
-      const db2 = b.deletedAt || b.completedAt || b.updatedAt;
-      return db2.getTime() - da.getTime();
-    });
+      if (filter === 'deleted') return !!task.isDeleted;
+      if (filter === 'completed') return !task.isDeleted && task.status === 'completed';
+      return !!task.isDeleted || task.status === 'completed' || task.status === 'cancelled';
+    }).sort((a, b) => stamp(b) - stamp(a));
   }, [tasks, filter]);
 
   const formatDate = (d?: Date) => {

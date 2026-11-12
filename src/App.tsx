@@ -10,7 +10,7 @@ import { TaskForm } from './components/Tasks/TaskForm';
 import { CalendarView } from './components/Calendar/CalendarView';
 import ArchiveView from './components/Archive/ArchiveView';
 import AnalyticsView from './components/Analytics/AnalyticsView';
-import { initializeDatabase } from './database/db';
+import { hasImmediateData, hydrateFromIndexedDB } from './database/taskStore';
 import { Task, TaskCategory } from './types';
 import './App.css';
 
@@ -20,14 +20,15 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [currentCategory, setCurrentCategory] = useState<TaskCategory | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => !hasImmediateData());
 
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [defaultCategory, setDefaultCategory] = useState<TaskCategory>('personal');
+  const ignoreAddUntil = React.useRef(0);
 
   useEffect(() => {
-    initializeDatabase().finally(() => setIsLoading(false));
+    hydrateFromIndexedDB().finally(() => setIsLoading(false));
   }, []);
 
   const handleNavigate = (page: Page, category?: TaskCategory) => {
@@ -37,9 +38,16 @@ function AppContent() {
   };
 
   const handleAddTask = (category?: TaskCategory) => {
+    if (Date.now() < ignoreAddUntil.current) return;
     setEditingTask(null);
     setDefaultCategory(category || currentCategory || 'personal');
     setTaskFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    ignoreAddUntil.current = Date.now() + 700;
+    setTaskFormOpen(false);
+    setEditingTask(null);
   };
 
   const handleEditTask = (task: Task) => {
@@ -108,15 +116,17 @@ function AppContent() {
         </main>
       </div>
 
-      <BottomNav
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-        onAddTask={() => handleAddTask(currentCategory)}
-      />
+      {!taskFormOpen && (
+        <BottomNav
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+          onAddTask={() => handleAddTask(currentCategory)}
+        />
+      )}
 
       <TaskForm
         isOpen={taskFormOpen}
-        onClose={() => { setTaskFormOpen(false); setEditingTask(null); }}
+        onClose={handleCloseForm}
         task={editingTask}
         defaultCategory={defaultCategory}
       />
