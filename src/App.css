@@ -1292,14 +1292,21 @@ body {
 /* 2-column grid that stacks on small mobile */
 .form-row-2 {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
-@media (min-width: 400px) {
+@media (min-width: 480px) {
   .form-row-2 {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
+}
+
+/* Date needs the wide column. Hours only sits beside it on a wide modal. */
+.form-row-date {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
 }
 
 /* 3-column for categories (stays 3 — text is short enough) */
@@ -1414,25 +1421,29 @@ body {
    FORM DATE/NUMBER INPUT FIXES FOR MOBILE
    ============================================= */
 
-/* Force date and number inputs to never overflow their container */
+/* Date and number inputs fill their cell and cannot blow out the row */
 input[type="date"],
 input[type="number"] {
-  min-width: 0;
+  display: block;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
-/* On iOS, date input has weird padding — normalize it */
 input[type="date"] {
   -webkit-appearance: none;
   appearance: none;
+  min-height: 42px;
 }
 
-/* form-row-2 always stacks on very small screens */
-@media (max-width: 360px) {
-  .form-row-2 {
-    grid-template-columns: 1fr !important;
-  }
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-date-and-time-value {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  padding: 0;
 }
 
 /* Modal must never be wider than viewport */

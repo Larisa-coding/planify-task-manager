@@ -180,11 +180,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
             </div>
           </div>
 
-          {/* Due date + Hours */}
-          <div className="form-row-2">
+          {/* Due date and hours are full width so the date field matches the other inputs */}
+          <div className="form-row-date">
             <div className="form-field">
-              <label className="form-label">{t.tasks.due_date}</label>
+              <label className="form-label" htmlFor="task-due-date">{t.tasks.due_date}</label>
               <input
+                id="task-due-date"
                 type="date"
                 className="glass-input"
                 value={dueDate}
@@ -192,8 +193,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({ isOpen, onClose, task, defau
               />
             </div>
             <div className="form-field">
-              <label className="form-label">{t.tasks.estimated_hours}</label>
+              <label className="form-label" htmlFor="task-hours">{t.tasks.estimated_hours}</label>
               <input
+                id="task-hours"
                 type="number"
                 className="glass-input"
                 value={estimatedHours}
